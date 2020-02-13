@@ -1,0 +1,67 @@
+---
+title: "Lab 1: Meta-analyses"
+output: html_notebook
+---
+# Part 1: In class demo
+
+# Load libraries
+```{r}
+library(tidyverse)
+#install.packages("meta")
+library(meta)
+```
+
+# Read in data
+```{r}
+studies <- read_csv(file="studies.csv")
+```
+
+#  Compare correlations across studies
+```{r}
+MA <-metacor(cor = r, n = n, studlab= Study, data=studies)
+MA
+```
+
+
+
+```{r, fig.height = 8}
+forest(MA)
+```
+
+```{r}
+funnel(MA)
+```
+
+
+
+# Part 2: Try it yourself
+
+# Load libraries
+```{r}
+library(tidyverse)
+#install.packages("meta")
+library(meta)
+```
+
+# Read in data
+```{r}
+studies <- read_csv(file="studies2.csv")
+```
+
+#  Compare correlations across studies
+```{r}
+MA <-metacor(cor = r, n = n, studlab= Study, data=studies)
+MA
+```
+
+
+# Create a forest plot
+```{r, fig.height = 8}
+forest(MA)
+```
+
+# Create a funnel plot
+```{r}
+funnel(MA)
+```
+

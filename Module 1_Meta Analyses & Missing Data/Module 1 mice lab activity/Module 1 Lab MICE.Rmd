@@ -1,0 +1,78 @@
+---
+title: "PSY 653 Module 1: Missing Data"
+subtitle: "Jan 29, 2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Part 1: In class Demo
+
+## Load Libraries
+```{r,message=FALSE}
+library(tidyverse)
+library(mice)
+library(olsrr)
+```
+
+## Read in data
+```{r,message=FALSE}
+mice_data1 <- read_csv("mice_data1.csv")
+```
+
+
+## Simple Linear regression model X1 ~ X2
+Using pairwise deletion for missing data by default
+```{r}
+mod1 <- lm(X1 ~ X2, data = mice_data1)
+ols_regress(mod1)
+```
+
+## Impute the dataset 5 times (using mice)
+```{r}
+imputed_data <- mice(mice_data1, m=5, maxit = 50, method = 'pmm', seed = 500)
+```
+
+
+## Regress X1 on X2 on imputed dataset using the "with" function
+```{r, results= hide}
+fit.mi <- with(imputed_data, exp= lm(X1 ~ X2))
+summary(fit.mi)
+```
+
+## Pool model estimates across imputed versions of the dataset
+```{r}
+combimp <- pool(fit.mi)
+summary(combimp)
+```
+
+# Part 2: Try it yourself
+
+## Read in data
+```{r,message=FALSE}
+mice_data2 <- read_csv("mice_data2.csv")
+```
+
+## Multiple Linear regression model X1 ~ X2 + X3 + X4
+Using pairwise deletion for missing data by default
+```{r}
+mod2 <- lm(X1 ~ X2 + X3 + X4, data = mice_data2)
+ols_regress(mod2)
+```
+
+## Impute the dataset 5 times (using mice)
+```{r}
+imputed_data <- mice(mice_data2, m=5, maxit = 50, method = 'pmm', seed = 500)
+```
+
+## Regress X1 on X2 on imputed dataset using the "with" function
+```{r, results= hide}
+fit.mi2 <- with(imputed_data, exp= lm(X1 ~ X2 + X3 + X4))
+summary(fit.mi2)
+```
+
+## Pool model estimates across imputed versions of the dataset
+```{r}
+combimp2 <- pool(fit.mi2)
+summary(combimp2)
+```

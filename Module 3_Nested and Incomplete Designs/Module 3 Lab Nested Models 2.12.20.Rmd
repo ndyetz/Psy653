@@ -1,0 +1,130 @@
+---
+title: "PSY 653 Module 3: Nested Designs"
+subtitle: "February 12, 2020"
+output: html_notebook
+---
+
+# Part 1: Demo of Nested ANOVAs
+
+## Load libraries
+```{r, message=FALSE}
+library(psych) # using for describe() function
+library(tidyverse) # using for read_csv() function, so character variables still kept as characters
+```
+
+## Read data
+```{r, message=FALSE}
+nested_demo<-read_csv(file="Nested_demo.csv")
+```
+
+## Check how variables are read
+```{r}
+str(nested_demo)
+```
+
+## Get variable descriptives
+```{r}
+describe(nested_demo) #note: we get NaN because variables are factors (data includes letters)
+```
+
+
+## Calculate the mean values of Y by hospital, drug, and condition
+```{r}
+# aggregate function here just shwows the values that we're comparing, but we're not saving these values
+aggregate(nested_demo$Y, by=list(Hospital=nested_demo$Hospital), mean)
+aggregate(nested_demo$Y, by=list(Drug=nested_demo$Drug), mean)
+aggregate(nested_demo$Y, by=list(Condition=nested_demo$Condition), mean)
+```
+
+## 5) Nested ANOVA in which Y is regressed on Hospital, Drug, Condition, and the
+## 5a) Create ANOVA table that lists all of the factors and the df for each
+
+Factors (i.e., effects we can test with this model)              
+Hospital                
+Drug                    
+Condition within Drug 
+Hospital * Drug
+Hospital * (Condition within Drug)
+Error
+
+## 5b) Conduct a Hospital x Drug ANOVA, ignoring Condition
+```{r}
+mod1 <- anova(lm(Y~Hospital + Drug + Hospital*Drug, data=nested_demo))
+mod1
+```
+
+## 5c) Conduct separate ANOVA for effect of condition
+```{r}
+mod2 <- anova(lm(Y~Drug/Condition + Hospital*(Drug/Condition), data=nested_demo))
+mod2 # get same model output as for the full model
+```
+
+## 5d) Conduct ANOVA on full nested model Full
+This gives same output as the two models above combined
+```{r}
+mod_full <- anova(lm(Y~Hospital + Drug + Drug/Condition + Hospital*Drug + Hospital*(Drug/Condition), data=nested_demo))
+mod_full
+
+# Syntax: / specifies within, and * specifies the interaction
+# Drug not nested within hospital in this data, because the drugs are the same between the two hospitals (i.e., the effects of a particular drug could be different from one hospital to the next).
+
+# Similarly, condition is not nested within hospital in this data, because the conditions are the same between the two hospitals (i.e., the effects of a particular condition could be different from one hospital to the next).
+
+# However, condition IS nested within drug, because the conditions are different between the two drugs. Since each condition was not tested for each drug, it is not possible to assess the possibility that the different conditions are different between the drugs.
+```
+
+# Part 2: Try it Yourself
+
+Factors (i.e., effects we can test with this model)              
+Hospital    (df=1)             
+Drug within hospital (df=2; 1 for each hospital)
+Condition within drug within hospital (df=8; 2 for each drug in each hospital)
+Error (df = 114-11-1 = 102)
+
+No interactions testable here, because the model is fully nested
+
+## Read data
+```{r, message=FALSE}
+nested_practice<-read_csv(file="Nested_practice.csv")
+```
+ 
+## Get variable descriptives
+```{r, row.print=13}
+psych::describe(nested_practice) #note: variables are characters (include text)
+```
+
+## 4
+### 4a) ANOVA table of factors and df for each
+Factors (i.e., effects we can test with this model)              
+Hospital    (df=1)             
+Drug within hospital (df=2; 1 for each hospital)
+Condition within drug within hospital (df=8; 2 for each drug in each hospital)
+Error (df = 114-11-1 = 102)
+
+No interactions testable here, because the model is fully nested
+
+### 4b) Run one-way ANOVA for Hospital, ignoring Condition and Drug 
+```{r}
+mod4 <- anova(lm(Y ~ Hospital, data=nested_practice))
+mod4
+```
+
+### 4c) Run one-way ANOVA for Drug (ignoring Condition) in Hospital 1, do the same thing in Hospital 2
+```{r}
+mod5 <- anova(lm(Y ~ Hospital/Drug, data=nested_practice))
+mod5
+```
+
+### 4d) Run one-way ANOVA for Condition and plug results into the ANOVA table
+```{r}
+mod6 <- anova(lm(Y ~ Hospital/Drug/Condition, data=nested_practice))
+mod6
+```
+
+### 4e) Run full nested ANOVA to test effect of Hospital, Drug, and Condition on Y
+```{r}
+mod3 <- anova(lm(Y ~ Hospital + Hospital/Drug + Hospital/Drug/Condition, data=nested_practice))
+mod3
+# drug is nested within hospital, condition is nested within drug, and both are nested within hospital
+```
+
