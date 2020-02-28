@@ -1,0 +1,8 @@
+"0","ezANOVA("
+"0","        data=syl,"
+"0","        dv=time,"
+"0","        wid=ID, "
+"0","        within= length,"
+"0","        between = cond,"
+"1","$ANOVA
+"

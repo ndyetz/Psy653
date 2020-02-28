@@ -1,0 +1,4 @@
+"0","syl <- mutate(syl, "
+"0","               cond   = factor(cond),"
+"0","               length = factor(length)"
+"0","               )"

@@ -1,0 +1,162 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load libraries
+```{r}
+library(tidyverse)
+library(ez)
+library(psych)
+```
+
+
+# Class example
+## Read in data
+```{r}
+syl <- read_csv("syllables.csv")
+```
+
+## Factor variables
+```{r}
+syl <- mutate(syl, 
+               ID     = factor(ID),
+               cond   = factor(cond),
+               length = factor(length)
+               )
+```
+
+
+## Repeated measures ANOVA
+```{r}
+ezANOVA(
+        data=syl,
+        dv=time,
+        wid=ID, 
+        within= length,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+### Visualize the effect
+```{r}
+
+
+syl_sum <- group_by(syl, length) 
+syl_sum <- summarise(syl_sum, time = mean(time)) 
+syl_sum <- ungroup(syl_sum)
+
+ggplot(syl_sum, aes(x = length, y = time, group = length, fill = length)) + 
+  geom_col(width = .5) +
+  theme_bw() 
+
+```
+
+
+
+## Mixed design
+```{r}
+ezANOVA(
+        data=syl,
+        dv=time,
+        wid=ID, 
+        within= length,
+        between = cond,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+
+### Visualize the effect
+```{r}
+
+
+syl_sum <- group_by(syl, cond, length) 
+syl_sum <- summarise(syl_sum, time = mean(time)) 
+syl_sum <- ungroup(syl_sum)
+
+ggplot(syl_sum, aes(x = length, y = time, group = length, fill = length)) + 
+  geom_col(width = .5) +
+  facet_wrap(~cond) +
+  theme_bw() 
+
+```
+
+
+
+# Assignment
+
+## Load data
+```{r}
+ex <- read_csv("RMexample.csv")
+```
+
+
+## Describe data
+```{r, warning = FALSE}
+describe(ex)
+```
+
+
+## Factor variables
+```{r}
+
+ex <- mutate(ex, 
+             Subject = factor(Subject),
+             Passage = factor(Passage),
+             Author = factor(Author),
+             Genre   = factor(Genre)
+             )
+```
+
+
+
+## Run ANOVA
+
+### Within subject effect
+```{r}
+ezANOVA(
+        data=ex,
+        dv=Y,
+        wid=Subject, 
+        within= Passage,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+#### Eta Squareds 
+```{r}
+
+```
+
+
+
+### Mixed ANOVA
+```{r, warning = FALSE}
+ezANOVA(
+        data=ex,
+        dv=Y,
+        wid=Subject, 
+        within= Passage,
+        between = .(Author, Genre),
+        detailed=TRUE,
+        type = 3
+        )
+
+
+```
+
+```{r}
+ex_sum <- group_by(ex, Author, Genre, Passage) 
+ex_sum <- summarise(ex_sum, Y = mean(Y)) 
+ex_sum <- ungroup(ex_sum)
+
+ggplot(ex_sum, aes(x = Passage, y = Y, group = Passage, fill = Passage)) + 
+  geom_col(width = .5) +
+  facet_wrap(~ Author + Genre) +
+  theme_bw() 
+```
+
