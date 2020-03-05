@@ -1,0 +1,2 @@
+"0","long <- mutate(long, "
+"0","               occassq = occas**2)"

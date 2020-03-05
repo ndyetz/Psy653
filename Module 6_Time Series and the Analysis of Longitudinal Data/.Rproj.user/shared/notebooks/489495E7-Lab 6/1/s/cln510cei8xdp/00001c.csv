@@ -1,0 +1,6 @@
+"0","ggplot(long, aes(x = occas, y = gpa)) +"
+"0","  geom_jitter(aes(color = factor(occas))) +"
+"0","  geom_smooth(method = ""loess"", color = ""red"", size = 2) +"
+"0","  xlab(""Occasion"") +"
+"0","  labs(color = ""Occasion"") +"
+"0","  facet_wrap(~sex)"

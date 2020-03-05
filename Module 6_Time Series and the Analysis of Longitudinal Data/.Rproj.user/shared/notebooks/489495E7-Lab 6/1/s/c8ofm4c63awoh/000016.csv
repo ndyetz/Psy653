@@ -1,0 +1,2 @@
+"0","agg_long <- aggregate(x=long$gpa,by=list(occasion = long$occas), FUN=mean)"
+"0","agg_long"

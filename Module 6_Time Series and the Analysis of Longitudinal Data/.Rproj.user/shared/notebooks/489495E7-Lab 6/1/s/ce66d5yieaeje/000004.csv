@@ -1,0 +1,10 @@
+"0","long <- read_csv(""Longitudinal.csv"")"
+"2","Parsed with column specification:
+cols(
+  student = [32mcol_double()[39m,
+  occas = [32mcol_double()[39m,
+  gpa = [32mcol_double()[39m,
+  job = [32mcol_double()[39m,
+  sex = [32mcol_double()[39m
+)
+"

@@ -1,0 +1,4 @@
+"0","long <- mutate(long, "
+"0","               job = factor(job, levels = c(0,1), labels = c(""half time"", ""full time"")),"
+"0","               sex = factor(sex, labels = c(""male"", ""female""))"
+"0","               )"
