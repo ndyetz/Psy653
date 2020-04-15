@@ -1,0 +1,361 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load Libraries
+```{r,message=FALSE}
+library(tidyverse)
+library(olsrr)
+library(psych) 
+```
+
+# Read in dataset
+```{r,message=FALSE}
+slp <- read_csv("slpdata.csv")
+```
+
+# Describe variables
+```{r}
+describe(slp)
+
+```
+categorical vars = cond, prior, & sex
+
+# Part 1: Using dummy coding, use treatment condition, sex, and their interaction to predict sleep hygiene.
+
+## Specify dummy codes for categorical predictors
+```{r}
+#sex & condition
+slp <- mutate(slp, 
+              sex = ifelse(sex == 1, 0, 1),
+              sex.f = factor(sex, levels = c(0,1), labels = c("male", "female")))
+
+slp <- mutate(slp,
+              cond2 = ifelse(cond == 2, 1, 0),
+              cond3 = ifelse(cond == 3, 1, 0)) 
+```
+
+## Run model
+```{r}
+m1 <- lm(hygiene ~ cond2 + cond3, data = slp)
+ols_regress(m1)
+```
+Interpretation of dummy coded model:
+
+Intercept: The predicted sleep hygiene score when all x variables are zero, so participants in Condition 1.
+
+cond2: the predicted difference in sleep hygiene score between particiants in condition 2 compared to condition 1.
+
+cond3: the predicted difference in sleep hygiene score between particiants in condition 3 compared to condition 1.
+
+## Run model with interaction
+```{r}
+m1 <- lm(hygiene ~ sex.f + cond2 + cond3 + sex.f*cond2 + sex.f*cond3, data = slp)
+ols_regress(m1)
+```
+
+Interpretation of dummy coding model:
+
+Intercept: The predicted sleep hygiene score when all x variables are zero, so males in Condition 1.
+
+female: This variable is involved in an interaction, so it's a simple slope. Specifically, it is the effect of female when both cond2 = 0 and cond3 = 0, so people in Condition 1. Therefore, it is the predicted difference in sleep hygiene between females and males in Condition 1. The slope is positive, meaning that females in Condition 1 tend to have better sleep hygiene than males in Condition 1. This is a sta-tistically significant difference (p-value is less than alpha).
+
+cond2: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 2 (compared to Condition 1) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 2 compared to males in Condition 1. This is a statistically significant difference (p-value is less than alpha).
+
+cond3: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 3 (compared to Condition 1) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 3 compared to males in Condition 1. This is a statistically significant difference (p-value is less than alpha).
+
+female:cond2: The predicted differential effect of being in Condition 2 compared to Condition 1 for females compared to males. This is a statistically significant difference (p-value is less than alpha). The coefficient for cond2 presents the effect (i.e., benefit) of being in Condition 2 (compared to 1) for males. To get the effect for females, we take the effect for males (2.084) and add the female:cond2 interaction term (-.643). Therefore, the effect (i.e., benefit) of being in Condition 2 (compared to Condition 1) for females is 1.441.
+
+female:cond3: The predicted differential effect of being in Condition 3 compared to Condition 1 for females compared to males. This is a statistically significant difference (p-value is less than alpha). The coefficient for cond3 presents the effect (i.e., benefit) of being in Condition 3 (compared to 1) for males. To get the effect for females, we take the effect for males (2.962) and add the female:cond3 interaction term (-1.160). Therefore, the effect (i.e., benefit) of being in Condition 3 (compared to Condition 1) for females is 1.802.
+
+# Part 2: Redo this analysis using effect coding for treatment condition
+
+## Specificy effect coding for categotical variables
+"With this coding structure the same process is completed as
+that for dummy coding except the last group receives a −1 on all contrasts, thus
+only k −1 contrasts are used in this coding type (Wendorf, 2004)." (from Davis, 2010)
+```{r}
+slp <- mutate(slp,
+              
+              cond2 = ifelse(cond == 2, 1, 0),
+              cond3 = ifelse(cond == 3, 1, 0),
+              
+              cond2 = ifelse(cond == 1, (-1), cond2),
+              cond3 = ifelse(cond == 1, (-1), cond3),
+              
+              cond.f = factor(cond, levels = c(1,2,3), labels = c("self help", "group-based", "group + partner"))) #need this label specifier here?
+```
+
+## Run model without interaction first
+```{r}
+m2 <- lm(hygiene ~ cond2 + cond3, data = slp)
+ols_regress(m2)
+```
+Interpretation of effect coding model:
+
+Effects coding allows us to examine mean differences between two groups. In effects coding, the slope estimates are simply the difference between the mean of the group coded as 1 and the grand mean of all the groups.
+
+Intercept: In effect coding, the intercept is the grand mean of sleep hygiene across all the three treatment groups
+
+cond2: the predicted difference in sleep hygiene score between particiants in condition 2 compared to the mean of all three treatment conditions.
+
+cond3: the predicted difference in sleep hygiene score between particiants in condition 3 compared to the mean of all three treatment conditions.
+
+## Run model with interaction
+```{r}
+m2 <- lm(hygiene ~ sex.f + cond2 + cond3 + sex.f*cond2 + sex.f*cond3, data = slp)
+ols_regress(m2)
+
+# Checking Math for intercept
+#test <- aggregate(x=slp$hygiene, by = list(sex = slp$sex, cond = slp$cond), FUN = mean)
+#test <- filter(test, sex == 0)
+#mean(test$x)
+
+#Checking math for female
+#test2 <- aggregate(x=slp$hygiene, by = list(sex = slp$sex, cond = slp$cond), FUN = mean)
+#test2
+#
+#test2 %>% 
+#  group_by(sex) %>% 
+#  summarise(mean(x))
+#
+#6.767221 - 5.432921
+```
+Interpretation of effect coding model:
+
+Effects coding allows us to examine mean differences between two groups. In effects coding, the slope estimates are simply the difference between the mean of the group coded as 1 and the grand mean of all the groups.
+
+Intercept:  The intercept is the grand mean of sleep hygiene among males (i.e., when x = 0) across all of the conditions.. 
+
+sex.ffemale: This variable is involved in an interaction, so it's a simple slope. It is the predicted difference in average sleep hygiene between females and males across all of the conditions
+
+cond2: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 2 (compared to the average of all three conditions) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 2 compared to the grand mean of sleep hygiene (the mean of condition 2 is 0.402 higher than the grand mean, 5.433). This is a statistically significant difference (p-value is less than alpha).
+
+cond3: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 3 (compared to the average of all three conditions) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 3 compared to the grand mean of sleep hygiene (the mean of condition 3 is 1.280 higher than the grand mean, 5.433). This is a statistically significant difference (p-value is less than alpha).
+
+female:cond2: The predicted differential effect of being in Condition 2 compared to the grand mean for females compared to males. This is not a statistically significant difference (p-value is greater than alpha). The coefficient for cond2 presents the effect (i.e., benefit) of being in Condition 2 (compared to average) for males. To get the effect for females, we take the effect for males (0.402) and add the female:cond2 interaction term (-.042). Therefore, the effect (i.e., benefit) of being in Condition 2 (compared to average for females is 0.36.
+
+female:cond3: The predicted differential effect of being in Condition 3 compared to average for females compared to males. This is a statistically significant difference (p-value is less than alpha). The coefficient for cond3 presents the effect (i.e., benefit) of being in Condition 3 (compared to average) for males. To get the effect for females, we take the effect for males (1.280) and add the female:cond3 interaction term (-.559). Therefore, the effect (i.e., benefit) of being in Condition 3 (compared to average) for females is 0.721.
+
+The model suggests that males benefit more from cond3 compared to average, compared to how much females benefit from cond3 compared to average.
+
+# Part 3: Orthogonal Polynomial Contrasts Practice
+
+## Read in dataset
+```{r}
+cog <- read_csv("cogtest.csv")
+```
+Description of dataset:
+Researcheres were interested in the effect of time spent in practice on the performance of a visual discrimination task. Subjects were randomly assigned to different levels of practice, following which a test of visual discrimination is administered, and the number of correct responses is recorded for each subject. 40 subjects were randomly assigned to practice 0 minutes, 2 minutes, 4 minutes, 6 minutes, 8 minutes, 10 minutes, 12 minutes, or 14 minutes.
+There are two variables:
+practice = minutes spent practicing, this was assigned by the experimenter
+score = the number of correct answers on the test
+
+## Filter the data to only include practive levels 0, 4, 8,and 12 minutes
+```{r}
+cog <- filter(cog, practice == 0 | practice == 4 | practice == 8 | practice == 12)
+```
+
+## Examine dataframe descriptives
+```{r}
+describe(cog)
+```
+
+## Plot the relationship between practice and score
+```{r}
+ggplot(cog, aes(x = practice, y = score)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+```
+What type of relationship do you think exists if any?
+
+The slope appears to become less steep as length of assigned practice time increases. Since there may be a curve to the regression line, we should test for more than a linear effect. Since we have four levels of our categorical variable, we can test both a quadratic and cubic effect.
+
+## Specify orthoganol polynomial contrast terms
+```{r}
+# these are common coefficients to specify for polynomial contrasts and these can be found online or in our demo slides. Note that we could use different contrasts for each type of relationship (e.g., linear, quadratic, etc.) if the categorical predictor had a different number of levels.
+# Also note that we could not evaluate a cubic effect if we had <4 levels of the categorical predictor.
+
+cog <- mutate(cog,
+              
+              linear = ifelse(practice == 0, -3, practice ),
+              linear = ifelse(practice == 4, -1, linear   ),
+              linear = ifelse(practice == 8,  1, linear   ),
+              linear = ifelse(practice == 12, 3, linear   ),
+              
+              quadratic = ifelse(practice == 0,  1, practice ),
+              quadratic = ifelse(practice == 4, -1, quadratic),
+              quadratic = ifelse(practice == 8, -1, quadratic),
+              quadratic = ifelse(practice == 12, 1, quadratic),
+              
+              cubic = ifelse(practice == 0, -1, practice),
+              cubic = ifelse(practice == 4,  3, cubic   ),
+              cubic = ifelse(practice == 8, -3, cubic   ),
+              cubic = ifelse(practice == 12, 1, cubic   )
+              )
+
+```
+
+## Run model with just the linear effect
+```{r}
+m3 <- lm(score ~ linear, data = cog)
+ols_regress(m3)
+```
+These are the results of the liner model. The model testing the linear relationship between practice and score explained 90.9% of the variance in score, and the linear trend was statistically significant at p<0.001. This model fits the data pretty well, but since we observed a potential curved relationship when we plotted the data, there could be a better way to examine this relationship.
+
+## Run model with the linear and quadratic effects
+```{r}
+m4 <- lm(score ~ linear + quadratic, data = cog)
+ols_regress(m4)
+```
+These are the results of the quadratic model. The model testing the linear relationship between practice and score explained 98.0% of the variance in score, which is 7.1% higher than the model that only tested the linear relationship. The quadratic term (named quadratic) is statistically significant, indicating that there is a substantial curve to the relationship between practice and score (i.e., it's not linear). We need to maintain the quadratic term in the model.
+
+## Run model with the linear, quadratic, and cubic effects
+```{r}
+m5 <- lm(score ~ linear + quadratic + cubic, data = cog)
+ols_regress(m5)
+```
+These are the results of the cubic model. We are testing the cubic term to determine if there is a second bend to the relationship between practice and score. Since we have at least four levels of our categorical predictor, we can test the cubic trend using polynomial contrasts. This model explains the same amount of variance in score as the previous model that only included the linear and quadratic effects (i.e., adding the cubic effect does not increase the explanatory power of the model). The cubic term (practice3) is not significant, indicating that there is not a second bend to the relationship. Therefore, the quadratic model is the best fit for these data.
+
+
+
+# Do it yourself activity
+## Load packages
+```{r}
+library(tsibble)
+library(tidycovid19)
+```
+
+## Download data
+```{r}
+covid <- download_merged_data(cached = TRUE)
+```
+
+## Recode lockdown variable
+```{r}
+covid <- mutate(covid, lockdown = ifelse(lockdown > 0, 1, lockdown))
+```
+
+
+## Dummy code/factor income & lockdown
+```{r}
+
+covid <- mutate(covid, 
+                
+               lowmid = ifelse(income == "Lower middle income", 1, 0),
+               upmid  = ifelse(income == "Upper middle income", 1, 0),
+               high   = ifelse(income == "High income"        , 1, 0),
+               
+               income = factor(income, 
+                                levels = c("Low income", "Lower middle income", "Upper middle income", "High income"),
+                                labels = c(1,2,3,4)),
+               
+               income = factor(income, 
+                                labels = c("Low income", "Lower middle income", "Upper middle income", "High income"),
+                                levels = c(1,2,3,4))        
+                                )
+               
+
+```
+
+## Describe data
+```{r}
+
+covid %>%
+  select_if(is.numeric) %>% 
+  describe()
+
+```
+```{r}
+table(covid$income)
+table(covid$lockdown)
+```
+
+## Run dummy model
+```{r}
+
+
+cov_dum <- lm(confirmed ~  lockdown + lowmid + upmid + high + lockdown*lowmid + lockdown*upmid + lockdown*high, 
+              data = covid)
+ols_regress(cov_dum)
+
+```
+
+
+## Effect coding variables
+```{r}
+covid <- mutate(covid,
+              
+               lowmid = ifelse(income == "Lower middle income", 1, 0),
+               upmid  = ifelse(income == "Upper middle income", 1, 0),
+               high   = ifelse(income == "High income"        , 1, 0),
+              
+              lowmid = ifelse(income == "Low income", (-1), lowmid),
+              upmid  = ifelse(income == "Low income", (-1), upmid ),
+              high   = ifelse(income == "Low income", (-1), high  )
+              ) 
+```
+
+## Run effect model
+```{r}
+
+
+cov_eff <- lm(confirmed ~  lockdown + lowmid + upmid + high + lockdown*lowmid + lockdown*upmid + lockdown*high, 
+              data = covid)
+ols_regress(cov_eff)
+
+```
+
+
+
+```{r}
+ggplot(covid, aes(x = as.numeric(income), y = confirmed)) +
+  geom_point(color = "grey") +
+  geom_smooth(method = "loess", se = FALSE, color = "red")
+```
+
+## Orthoganol polynomials
+```{r}
+
+covid <- mutate(covid,
+              
+              linear = ifelse(income == "Low income"         , -3, income ),
+              linear = ifelse(income == "Lower middle income", -1, linear   ),
+              linear = ifelse(income == "Upper middle income",  1, linear   ),
+              linear = ifelse(income == "High income"        ,  3, linear   ),
+              
+              quadratic = ifelse(income == "Low income"         ,  1, income ),
+              quadratic = ifelse(income == "Lower middle income", -1, quadratic),
+              quadratic = ifelse(income == "Upper middle income", -1, quadratic),
+              quadratic = ifelse(income == "High income"        ,  1, quadratic),
+              
+              cubic = ifelse(income == "Low income"         , -1, income),
+              cubic = ifelse(income == "Lower middle income",  3, cubic   ),
+              cubic = ifelse(income == "Upper middle income", -3, cubic   ),
+              cubic = ifelse(income == "High income"        ,  1, cubic   )
+              )
+
+```
+
+```{r}
+cov_linear <- lm(confirmed ~ linear, data = covid)
+ols_regress(cov_linear)
+```
+
+
+
+```{r}
+cov_quadratic <- lm(confirmed ~ linear + quadratic, data = covid)
+ols_regress(cov_quadratic)
+```
+
+
+```{r}
+cov_cubic <- lm(confirmed ~ linear + quadratic + cubic, data = covid)
+ols_regress(cov_cubic)
+```
+
+
+
+
