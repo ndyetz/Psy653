@@ -1,0 +1,211 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load libraries
+```{r,message=FALSE}
+library(tidyverse)
+library(psych)
+library(mediation)
+library(ppcor)
+```
+
+# Read in data
+```{r}
+med <- read_csv("mediate2.csv")
+```
+
+# Class Demo
+## Baron & Kenny Plausibility: Examine Correlations between variables
+## Analysis 1: Test the hypothesis that X4 mediates the relationship between X1 and Y1
+
+```{r}
+cor(med)
+```
+
+r xy = 0.3465 (c path)
+r xm = 0.043 (a path)
+r my = 0.4105 (b path)
+
+We do not have justification to test this mdiation hypothesis because the a path has a negligible effect.
+
+## Analysis 2: Test the hypothesis that X4 mediates the relationship between X3 and Y1
+
+r xy = 0.5053
+r xm = 0.3425
+r my = 0.4105
+
+We do have justifaction to test this mediation hypothesis because all paths have a moderate effect
+
+```{r}
+spcor.test(x = med$X3, y = med$Y1, z = med$X4)
+```
+
+r y(x.m) = 0.3999. This is 0.11 smaller than r xy (0.5053), indicating that partial mediation is plausible. In other words, there is a portion of the relation betweeen x and y that involves m.
+
+
+### Regression method
+```{r}
+m1 <- lm(Y1 ~ X3      , data = med)
+m2 <- lm(Y1 ~ X3 + X4 , data = med)
+
+anova(m1,m2)
+
+```
+
+
+
+### mediate in psych
+```{r}
+
+fitmed <- psych::mediate(Y1 ~ X3 + (X4), data = med)
+summary(fitmed)
+
+```
+
+
+
+### Mediate in mediation package
+```{r}
+fitM <- lm(X4 ~ X3, data = med)
+fitY <- lm(Y1 ~ X3 + X4, data = med)
+
+
+fitmed <- mediation::mediate(fitM, fitY, treat = "X3", mediator = "X4")
+summary(fitmed)
+
+```
+
+```{r}
+cor(med)
+```
+
+## Analysis 3: Test the hypothesis that X4 mediates the relationship between X5 and Y1
+
+r xy = 0.6405
+r xm = 0.4068
+r my = 0.4105
+
+We do have justifaction to test this mediation hypothesis because all paths have a moderate effect
+
+```{r}
+spcor.test(x = med$X5, y = med$Y1, z = med$X4)
+```
+
+
+r y(x.m) = 0.5192. This is 0.12 smaller than r xy (0.6405), indicating that partial mediation is plausible. In other words, there is a portion of the relation betweeen x and y that involves m.
+
+
+
+### Regression method
+```{r}
+m1 <- lm(Y1 ~ X5      , data = med)
+m2 <- lm(Y1 ~ X5 + X4 , data = med)
+
+anova(m1,m2)
+
+```
+
+
+### mediate in psych
+```{r}
+
+fitmed <- psych::mediate(Y1 ~ X5 + (X4), data = med)
+summary(fitmed)
+
+```
+
+
+### Mediate in mediation package
+```{r}
+fitM <- lm(X4 ~ X5, data = med)
+fitY <- lm(Y1 ~ X5 + X4, data = med)
+
+
+fitmed <- mediation::mediate(fitM, fitY, treat = "X5", mediator = "X4")
+summary(fitmed)
+
+```
+
+
+# Class Activity
+
+## Read data
+```{r}
+slp <- read_csv("slpdata.csv")
+```
+
+
+
+## Baron & Kenny Plausibility: Examine Correlations between variables
+```{r}
+cor(slp)
+```
+
+## Analysis 1: Test the hypothesis that sleep efficiency mediates the relationship between sleep hygiene and life satisfaction.
+
+r xy = 0.5053
+r xm = 0.7332
+r my = 0.6405
+
+We do have justifaction to test this mediation hypothesis because all paths have a moderate to large effect
+
+```{r}
+spcor.test(x = slp$hygiene, y = slp$lifesat, z = slp$sleep)
+```
+
+
+
+r y(x.m) = 0.0464. This is 0.12 smaller than r xy (0.5053), indicating that partial mediation is plausible. In other words, there is a portion of the relation betweeen x and y that involves m.
+
+
+### Regression method
+```{r}
+m1 <- lm(lifesat ~ hygiene         , data = slp)
+m2 <- lm(lifesat ~ hygiene + sleep , data = slp)
+
+anova(m1,m2)
+```
+
+### mediate in psych
+```{r}
+
+fitmed <- psych::mediate(lifesat ~ hygiene + (sleep), data = slp)
+summary(fitmed)
+
+```
+
+
+### Mediate in mediation package
+```{r}
+fitM <- lm(sleep   ~ hygiene        , data = slp)
+fitY <- lm(lifesat ~ hygiene + sleep, data = slp)
+
+
+fitmed <- mediation::mediate(fitM, fitY, treat = "hygiene", mediator = "sleep")
+summary(fitmed)
+
+```
+
+## Analysis 2: Test the hypothesis that sleep efficiency mediates the relationship between anxiety and life satisfaction.
+### Baron & Kenny Plausibility: Examine Correlations between variables
+```{r}
+cor(slp)
+```
+
+r xy = -0.3228
+r xm = -0.1310
+r my = 0.6405
+
+We do NOT have justifaction to test this mediation hypothesis because path a has a negligible correlation effect size (-.1310)
+
+
+```{r}
+spcor.test(x = slp$anxiety, y = slp$lifesat, z = slp$sleep)
+```
+
+r y(x.m) = -0.3110. This is 0.0118 only slighlty larger (closer to zero) than r xy (-0.3228), indicating that partial mediation is NOT plausible.
+
+
+
