@@ -1,0 +1,4 @@
+"0","teams <- teams %>%"
+"0","mutate(txcond.f = factor(txcond, levels = c(0,1), labels = c(""control"", ""treatment"")),"
+"0","       team_id.f = factor(team_id))"
+"0","					"

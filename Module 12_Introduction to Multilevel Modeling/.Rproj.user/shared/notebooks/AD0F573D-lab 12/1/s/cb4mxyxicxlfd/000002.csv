@@ -1,0 +1,11 @@
+"0","teams <- read_csv(""mlm_teams.csv"")"
+"2","Parsed with column specification:
+cols(
+  kid_id = [32mcol_double()[39m,
+  team_id = [32mcol_double()[39m,
+  txcond = [32mcol_double()[39m,
+  risk = [32mcol_double()[39m,
+  score = [32mcol_double()[39m,
+  comafrd = [32mcol_double()[39m
+)
+"
