@@ -1,6 +1,9 @@
 ---
 title: "R Notebook"
-output: html_notebook
+author: "Neil yetz & Gemma Wallace"
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 # Kevin's R code

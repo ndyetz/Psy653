@@ -1,7 +1,9 @@
 ---
-title: "PSY 653 Module 2: Interaction Effects (aka Moderation)"
-subtitle: "Feb 5, 2020"
+title: 'PSY 653 Module 2: Interaction Effects (aka Moderation)'
+author: "Neil Yetz & Gemma Wallace"
+subtitle: Feb 5, 2020
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---

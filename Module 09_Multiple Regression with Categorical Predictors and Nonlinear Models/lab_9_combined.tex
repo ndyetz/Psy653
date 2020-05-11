@@ -1,0 +1,1368 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={R Notebook},
+            pdfauthor={Neil Yetz \& Gemma Wallace},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{R Notebook}
+\author{Neil Yetz \& Gemma Wallace}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Load Libraries}\label{load-libraries}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tibble' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tidyr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'forcats' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(olsrr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'olsrr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(psych) }
+\end{Highlighting}
+\end{Shaded}
+
+\section{Read in dataset}\label{read-in-dataset}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{slp <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"slpdata.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Describe variables}\label{describe-variables}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{describe}\NormalTok{(slp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         vars   n   mean     sd median trimmed    mad   min    max  range  skew
+## cond       1 600   2.00   0.82   2.00    2.00   1.48  1.00   3.00   2.00  0.00
+## prior      2 600   0.72   0.45   1.00    0.78   0.00  0.00   1.00   1.00 -1.00
+## age        3 600  44.94  12.87  45.20   45.12  16.46 20.00  67.80  47.80 -0.10
+## anxiety    4 600   3.88   0.90   3.86    3.89   0.93  1.05   6.84   5.79 -0.07
+## hygiene    5 600   5.99   1.57   6.05    6.04   1.57  1.68   9.74   8.06 -0.23
+## support    6 600   3.04   0.68   2.96    3.02   0.73  1.09   4.91   3.82  0.21
+## sleep      7 600  68.88  12.14  69.00   69.09  11.86 34.00  99.00  65.00 -0.16
+## lifesat    8 600   4.06   0.92   4.05    4.04   0.96  1.68   6.61   4.93  0.13
+## sex        9 600   1.41   0.49   1.00    1.39   0.00  1.00   2.00   1.00  0.36
+## id        10 600 300.50 173.35 300.50  300.50 222.39  1.00 600.00 599.00  0.00
+##         kurtosis   se
+## cond       -1.50 0.03
+## prior      -1.01 0.02
+## age        -1.14 0.53
+## anxiety    -0.06 0.04
+## hygiene    -0.29 0.06
+## support    -0.51 0.03
+## sleep      -0.17 0.50
+## lifesat    -0.23 0.04
+## sex        -1.87 0.02
+## id         -1.21 7.08
+\end{verbatim}
+
+categorical vars = cond, prior, \& sex
+
+\section{Part 1: Using dummy coding, use treatment condition, sex, and
+their interaction to predict sleep
+hygiene.}\label{part-1-using-dummy-coding-use-treatment-condition-sex-and-their-interaction-to-predict-sleep-hygiene.}
+
+\subsection{Specify dummy codes for categorical
+predictors}\label{specify-dummy-codes-for-categorical-predictors}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#sex & condition}
+\NormalTok{slp <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(slp, }
+              \DataTypeTok{sex =} \KeywordTok{ifelse}\NormalTok{(sex }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+              \DataTypeTok{sex.f =} \KeywordTok{factor}\NormalTok{(sex, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{), }\DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"male"}\NormalTok{, }\StringTok{"female"}\NormalTok{)))}
+
+\NormalTok{slp <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(slp,}
+              \DataTypeTok{cond2 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+              \DataTypeTok{cond3 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)) }
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Run model}\label{run-model}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m1 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(hygiene }\OperatorTok{~}\StringTok{ }\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{cond3, }\DataTypeTok{data =}\NormalTok{ slp)}
+\KeywordTok{ols_regress}\NormalTok{(m1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                          
+## --------------------------------------------------------------
+## R                       0.630       RMSE                1.224 
+## R-Squared               0.397       Coef. Var          20.418 
+## Adj. R-Squared          0.395       MSE                 1.498 
+## Pred R-Squared          0.391       MAE                 0.973 
+## --------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                  
+## ----------------------------------------------------------------------
+##                 Sum of                                                
+##                Squares         DF    Mean Square       F         Sig. 
+## ----------------------------------------------------------------------
+## Regression     589.467          2        294.733    196.774    0.0000 
+## Residual       894.205        597          1.498                      
+## Total         1483.671        599                                     
+## ----------------------------------------------------------------------
+## 
+##                                  Parameter Estimates                                  
+## -------------------------------------------------------------------------------------
+##       model     Beta    Std. Error    Std. Beta      t        Sig     lower    upper 
+## -------------------------------------------------------------------------------------
+## (Intercept)    4.660         0.087                 53.853    0.000    4.490    4.830 
+##       cond2    1.627         0.122        0.488    13.293    0.000    1.386    1.867 
+##       cond3    2.374         0.122        0.712    19.399    0.000    2.134    2.615 
+## -------------------------------------------------------------------------------------
+\end{verbatim}
+
+Interpretation of dummy coded model:
+
+Intercept: The predicted sleep hygiene score when all x variables are
+zero, so participants in Condition 1.
+
+cond2: the predicted difference in sleep hygiene score between
+particiants in condition 2 compared to condition 1.
+
+cond3: the predicted difference in sleep hygiene score between
+particiants in condition 3 compared to condition 1.
+
+\subsection{Run model with
+interaction}\label{run-model-with-interaction}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m1 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(hygiene }\OperatorTok{~}\StringTok{ }\NormalTok{sex.f }\OperatorTok{+}\StringTok{ }\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{cond3 }\OperatorTok{+}\StringTok{ }\NormalTok{sex.f}\OperatorTok{*}\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{sex.f}\OperatorTok{*}\NormalTok{cond3, }\DataTypeTok{data =}\NormalTok{ slp)}
+\KeywordTok{ols_regress}\NormalTok{(m1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                          
+## --------------------------------------------------------------
+## R                       0.771       RMSE                1.007 
+## R-Squared               0.594       Coef. Var          16.801 
+## Adj. R-Squared          0.591       MSE                 1.014 
+## Pred R-Squared          0.585       MAE                 0.799 
+## --------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                  
+## ----------------------------------------------------------------------
+##                 Sum of                                                
+##                Squares         DF    Mean Square       F         Sig. 
+## ----------------------------------------------------------------------
+## Regression     881.213          5        176.243    173.768    0.0000 
+## Residual       602.459        594          1.014                      
+## Total         1483.671        599                                     
+## ----------------------------------------------------------------------
+## 
+##                                      Parameter Estimates                                       
+## ----------------------------------------------------------------------------------------------
+##             model      Beta    Std. Error    Std. Beta      t        Sig      lower     upper 
+## ----------------------------------------------------------------------------------------------
+##       (Intercept)     3.751         0.098                 38.346    0.000     3.559     3.943 
+##       sex.ffemale     1.935         0.143        0.418    13.562    0.000     1.655     2.215 
+##             cond2     2.084         0.132        0.625    15.813    0.000     1.825     2.343 
+##             cond3     2.962         0.135        0.888    21.933    0.000     2.697     3.227 
+## sex.ffemale:cond2    -0.643         0.207       -0.119    -3.113    0.002    -1.048    -0.237 
+## sex.ffemale:cond3    -1.160         0.203       -0.223    -5.710    0.000    -1.558    -0.761 
+## ----------------------------------------------------------------------------------------------
+\end{verbatim}
+
+Interpretation of dummy coding model:
+
+Intercept: The predicted sleep hygiene score when all x variables are
+zero, so males in Condition 1.
+
+female: This variable is involved in an interaction, so it's a simple
+slope. Specifically, it is the effect of female when both cond2 = 0 and
+cond3 = 0, so people in Condition 1. Therefore, it is the predicted
+difference in sleep hygiene between females and males in Condition 1.
+The slope is positive, meaning that females in Condition 1 tend to have
+better sleep hygiene than males in Condition 1. This is a sta-tistically
+significant difference (p-value is less than alpha).
+
+cond2: This variable is involved in an interaction, so it is a simple
+slope. It is the effect of being in Condition 2 (compared to Condition
+1) when female = 0, so among males. It is the predicted difference in
+sleep hygiene for males in Condition 2 compared to males in Condition 1.
+This is a statistically significant difference (p-value is less than
+alpha).
+
+cond3: This variable is involved in an interaction, so it is a simple
+slope. It is the effect of being in Condition 3 (compared to Condition
+1) when female = 0, so among males. It is the predicted difference in
+sleep hygiene for males in Condition 3 compared to males in Condition 1.
+This is a statistically significant difference (p-value is less than
+alpha).
+
+female:cond2: The predicted differential effect of being in Condition 2
+compared to Condition 1 for females compared to males. This is a
+statistically significant difference (p-value is less than alpha). The
+coefficient for cond2 presents the effect (i.e., benefit) of being in
+Condition 2 (compared to 1) for males. To get the effect for females, we
+take the effect for males (2.084) and add the female:cond2 interaction
+term (-.643). Therefore, the effect (i.e., benefit) of being in
+Condition 2 (compared to Condition 1) for females is 1.441.
+
+female:cond3: The predicted differential effect of being in Condition 3
+compared to Condition 1 for females compared to males. This is a
+statistically significant difference (p-value is less than alpha). The
+coefficient for cond3 presents the effect (i.e., benefit) of being in
+Condition 3 (compared to 1) for males. To get the effect for females, we
+take the effect for males (2.962) and add the female:cond3 interaction
+term (-1.160). Therefore, the effect (i.e., benefit) of being in
+Condition 3 (compared to Condition 1) for females is 1.802.
+
+\section{Part 2: Redo this analysis using effect coding for treatment
+condition}\label{part-2-redo-this-analysis-using-effect-coding-for-treatment-condition}
+
+\subsection{Specificy effect coding for categotical
+variables}\label{specificy-effect-coding-for-categotical-variables}
+
+``With this coding structure the same process is completed as that for
+dummy coding except the last group receives a −1 on all contrasts, thus
+only k −1 contrasts are used in this coding type (Wendorf, 2004).''
+(from Davis, 2010)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{slp <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(slp,}
+              
+              \DataTypeTok{cond2 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+              \DataTypeTok{cond3 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+              
+              \DataTypeTok{cond2 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{, (}\OperatorTok{-}\DecValTok{1}\NormalTok{), cond2),}
+              \DataTypeTok{cond3 =} \KeywordTok{ifelse}\NormalTok{(cond }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{, (}\OperatorTok{-}\DecValTok{1}\NormalTok{), cond3),}
+              
+              \DataTypeTok{cond.f =} \KeywordTok{factor}\NormalTok{(cond, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{), }\DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"self help"}\NormalTok{, }\StringTok{"group-based"}\NormalTok{, }\StringTok{"group + partner"}\NormalTok{))) }\CommentTok{#need this label specifier here?}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Run model without interaction
+first}\label{run-model-without-interaction-first}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(hygiene }\OperatorTok{~}\StringTok{ }\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{cond3, }\DataTypeTok{data =}\NormalTok{ slp)}
+\KeywordTok{ols_regress}\NormalTok{(m2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                          
+## --------------------------------------------------------------
+## R                       0.630       RMSE                1.224 
+## R-Squared               0.397       Coef. Var          20.418 
+## Adj. R-Squared          0.395       MSE                 1.498 
+## Pred R-Squared          0.391       MAE                 0.973 
+## --------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                  
+## ----------------------------------------------------------------------
+##                 Sum of                                                
+##                Squares         DF    Mean Square       F         Sig. 
+## ----------------------------------------------------------------------
+## Regression     589.467          2        294.733    196.774    0.0000 
+## Residual       894.205        597          1.498                      
+## Total         1483.671        599                                     
+## ----------------------------------------------------------------------
+## 
+##                                  Parameter Estimates                                   
+## --------------------------------------------------------------------------------------
+##       model     Beta    Std. Error    Std. Beta       t        Sig     lower    upper 
+## --------------------------------------------------------------------------------------
+## (Intercept)    5.994         0.050                 119.969    0.000    5.896    6.092 
+##       cond2    0.293         0.071        0.152      4.149    0.000    0.154    0.432 
+##       cond3    1.041         0.071        0.540     14.726    0.000    0.902    1.179 
+## --------------------------------------------------------------------------------------
+\end{verbatim}
+
+Interpretation of effect coding model:
+
+Effects coding allows us to examine mean differences between two groups.
+In effects coding, the slope estimates are simply the difference between
+the mean of the group coded as 1 and the grand mean of all the groups.
+
+Intercept: In effect coding, the intercept is the grand mean of sleep
+hygiene across all the three treatment groups
+
+cond2: the predicted difference in sleep hygiene score between
+particiants in condition 2 compared to the mean of all three treatment
+conditions.
+
+cond3: the predicted difference in sleep hygiene score between
+particiants in condition 3 compared to the mean of all three treatment
+conditions.
+
+\subsection{Run model with
+interaction}\label{run-model-with-interaction-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(hygiene }\OperatorTok{~}\StringTok{ }\NormalTok{sex.f }\OperatorTok{+}\StringTok{ }\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{cond3 }\OperatorTok{+}\StringTok{ }\NormalTok{sex.f}\OperatorTok{*}\NormalTok{cond2 }\OperatorTok{+}\StringTok{ }\NormalTok{sex.f}\OperatorTok{*}\NormalTok{cond3, }\DataTypeTok{data =}\NormalTok{ slp)}
+\KeywordTok{ols_regress}\NormalTok{(m2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                          
+## --------------------------------------------------------------
+## R                       0.771       RMSE                1.007 
+## R-Squared               0.594       Coef. Var          16.801 
+## Adj. R-Squared          0.591       MSE                 1.014 
+## Pred R-Squared          0.585       MAE                 0.799 
+## --------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                  
+## ----------------------------------------------------------------------
+##                 Sum of                                                
+##                Squares         DF    Mean Square       F         Sig. 
+## ----------------------------------------------------------------------
+## Regression     881.213          5        176.243    173.768    0.0000 
+## Residual       602.459        594          1.014                      
+## Total         1483.671        599                                     
+## ----------------------------------------------------------------------
+## 
+##                                       Parameter Estimates                                       
+## -----------------------------------------------------------------------------------------------
+##             model      Beta    Std. Error    Std. Beta       t        Sig      lower     upper 
+## -----------------------------------------------------------------------------------------------
+##       (Intercept)     5.433         0.054                 101.005    0.000     5.327     5.539 
+##       sex.ffemale     1.334         0.084        0.418     15.880    0.000     1.169     1.499 
+##             cond2     0.402         0.074        0.209      5.425    0.000     0.257     0.548 
+##             cond3     1.280         0.076        0.665     16.831    0.000     1.131     1.429 
+## sex.ffemale:cond2    -0.042         0.120       -0.014     -0.349    0.727    -0.278     0.194 
+## sex.ffemale:cond3    -0.559         0.118       -0.193     -4.719    0.000    -0.791    -0.326 
+## -----------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Checking Math for intercept}
+\CommentTok{#test <- aggregate(x=slp$hygiene, by = list(sex = slp$sex, cond = slp$cond), FUN = mean)}
+\CommentTok{#test <- filter(test, sex == 0)}
+\CommentTok{#mean(test$x)}
+
+\CommentTok{#Checking math for female}
+\CommentTok{#test2 <- aggregate(x=slp$hygiene, by = list(sex = slp$sex, cond = slp$cond), FUN = mean)}
+\CommentTok{#test2}
+\CommentTok{#}
+\CommentTok{#test2 %>% }
+\CommentTok{#  group_by(sex) %>% }
+\CommentTok{#  summarise(mean(x))}
+\CommentTok{#}
+\CommentTok{#6.767221 - 5.432921}
+\end{Highlighting}
+\end{Shaded}
+
+Interpretation of effect coding model:
+
+Effects coding allows us to examine mean differences between two groups.
+In effects coding, the slope estimates are simply the difference between
+the mean of the group coded as 1 and the grand mean of all the groups.
+
+Intercept: The intercept is the grand mean of sleep hygiene among males
+(i.e., when x = 0) across all of the conditions..
+
+sex.ffemale: This variable is involved in an interaction, so it's a
+simple slope. It is the predicted difference in average sleep hygiene
+between females and males across all of the conditions
+
+cond2: This variable is involved in an interaction, so it is a simple
+slope. It is the effect of being in Condition 2 (compared to the average
+of all three conditions) when female = 0, so among males. It is the
+predicted difference in sleep hygiene for males in Condition 2 compared
+to the grand mean of sleep hygiene (the mean of condition 2 is 0.402
+higher than the grand mean, 5.433). This is a statistically significant
+difference (p-value is less than alpha).
+
+cond3: This variable is involved in an interaction, so it is a simple
+slope. It is the effect of being in Condition 3 (compared to the average
+of all three conditions) when female = 0, so among males. It is the
+predicted difference in sleep hygiene for males in Condition 3 compared
+to the grand mean of sleep hygiene (the mean of condition 3 is 1.280
+higher than the grand mean, 5.433). This is a statistically significant
+difference (p-value is less than alpha).
+
+female:cond2: The predicted differential effect of being in Condition 2
+compared to the grand mean for females compared to males. This is not a
+statistically significant difference (p-value is greater than alpha).
+The coefficient for cond2 presents the effect (i.e., benefit) of being
+in Condition 2 (compared to average) for males. To get the effect for
+females, we take the effect for males (0.402) and add the female:cond2
+interaction term (-.042). Therefore, the effect (i.e., benefit) of being
+in Condition 2 (compared to average for females is 0.36.
+
+female:cond3: The predicted differential effect of being in Condition 3
+compared to average for females compared to males. This is a
+statistically significant difference (p-value is less than alpha). The
+coefficient for cond3 presents the effect (i.e., benefit) of being in
+Condition 3 (compared to average) for males. To get the effect for
+females, we take the effect for males (1.280) and add the female:cond3
+interaction term (-.559). Therefore, the effect (i.e., benefit) of being
+in Condition 3 (compared to average) for females is 0.721.
+
+The model suggests that males benefit more from cond3 compared to
+average, compared to how much females benefit from cond3 compared to
+average.
+
+\section{Part 3: Orthogonal Polynomial Contrasts
+Practice}\label{part-3-orthogonal-polynomial-contrasts-practice}
+
+\subsection{Read in dataset}\label{read-in-dataset-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cog <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"cogtest.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parsed with column specification:
+## cols(
+##   subject = col_double(),
+##   practice = col_double(),
+##   score = col_double()
+## )
+\end{verbatim}
+
+Description of dataset: Researcheres were interested in the effect of
+time spent in practice on the performance of a visual discrimination
+task. Subjects were randomly assigned to different levels of practice,
+following which a test of visual discrimination is administered, and the
+number of correct responses is recorded for each subject. 40 subjects
+were randomly assigned to practice 0 minutes, 2 minutes, 4 minutes, 6
+minutes, 8 minutes, 10 minutes, 12 minutes, or 14 minutes. There are two
+variables: practice = minutes spent practicing, this was assigned by the
+experimenter score = the number of correct answers on the test
+
+\subsection{Filter the data to only include practive levels 0, 4, 8,and
+12
+minutes}\label{filter-the-data-to-only-include-practive-levels-0-4-8and-12-minutes}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cog <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(cog, practice }\OperatorTok{==}\StringTok{ }\DecValTok{0} \OperatorTok{|}\StringTok{ }\NormalTok{practice }\OperatorTok{==}\StringTok{ }\DecValTok{4} \OperatorTok{|}\StringTok{ }\NormalTok{practice }\OperatorTok{==}\StringTok{ }\DecValTok{8} \OperatorTok{|}\StringTok{ }\NormalTok{practice }\OperatorTok{==}\StringTok{ }\DecValTok{12}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Examine dataframe
+descriptives}\label{examine-dataframe-descriptives}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{describe}\NormalTok{(cog)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          vars  n  mean    sd median trimmed   mad  min   max range  skew
+## subject     1 20 18.00 11.56  18.00   18.00 14.83 1.00 35.00 34.00  0.00
+## practice    2 20  6.00  4.59   6.00    6.00  5.93 0.00 12.00 12.00  0.00
+## score       3 20 15.14  8.48  17.95   15.71  7.43 1.06 25.54 24.48 -0.55
+##          kurtosis   se
+## subject     -1.48 2.59
+## practice    -1.52 1.03
+## score       -1.30 1.90
+\end{verbatim}
+
+\subsection{Plot the relationship between practice and
+score}\label{plot-the-relationship-between-practice-and-score}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(cog, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ practice, }\DataTypeTok{y =}\NormalTok{ score)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"loess"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at -0.06
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 8.06
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 4.896e-017
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 64.964
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used at
+## -0.06
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius 8.06
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal condition
+## number 4.896e-017
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other near
+## singularities as well. 64.964
+\end{verbatim}
+
+\includegraphics{lab_9_combined_files/figure-latex/unnamed-chunk-13-1.pdf}
+What type of relationship do you think exists if any?
+
+The slope appears to become less steep as length of assigned practice
+time increases. Since there may be a curve to the regression line, we
+should test for more than a linear effect. Since we have four levels of
+our categorical variable, we can test both a quadratic and cubic effect.
+
+\subsection{Specify orthoganol polynomial contrast
+terms}\label{specify-orthoganol-polynomial-contrast-terms}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# these are common coefficients to specify for polynomial contrasts and these can be found online or in our demo slides. Note that we could use different contrasts for each type of relationship (e.g., linear, quadratic, etc.) if the categorical predictor had a different number of levels.}
+\CommentTok{# Also note that we could not evaluate a cubic effect if we had <4 levels of the categorical predictor.}
+
+\NormalTok{cog <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(cog,}
+              
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{, }\OperatorTok{-}\DecValTok{3}\NormalTok{, practice ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{4}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, linear   ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{,  }\DecValTok{1}\NormalTok{, linear   ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{12}\NormalTok{, }\DecValTok{3}\NormalTok{, linear   ),}
+              
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{,  }\DecValTok{1}\NormalTok{, practice ),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{4}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, quadratic),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, quadratic),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{, quadratic),}
+              
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, practice),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{4}\NormalTok{,  }\DecValTok{3}\NormalTok{, cubic   ),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{8}\NormalTok{, }\OperatorTok{-}\DecValTok{3}\NormalTok{, cubic   ),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(practice }\OperatorTok{==}\StringTok{ }\DecValTok{12}\NormalTok{, }\DecValTok{1}\NormalTok{, cubic   )}
+\NormalTok{              )}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Run model with just the linear
+effect}\label{run-model-with-just-the-linear-effect}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m3 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(score }\OperatorTok{~}\StringTok{ }\NormalTok{linear, }\DataTypeTok{data =}\NormalTok{ cog)}
+\KeywordTok{ols_regress}\NormalTok{(m3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                          
+## --------------------------------------------------------------
+## R                       0.953       RMSE                2.635 
+## R-Squared               0.909       Coef. Var          17.400 
+## Adj. R-Squared          0.903       MSE                 6.943 
+## Pred R-Squared          0.886       MAE                 2.207 
+## --------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                 
+## ---------------------------------------------------------------------
+##                 Sum of                                               
+##                Squares        DF    Mean Square       F         Sig. 
+## ---------------------------------------------------------------------
+## Regression    1240.975         1       1240.975    178.727    0.0000 
+## Residual       124.981        18          6.943                      
+## Total         1365.957        19                                     
+## ---------------------------------------------------------------------
+## 
+##                                   Parameter Estimates                                    
+## ----------------------------------------------------------------------------------------
+##       model      Beta    Std. Error    Std. Beta      t        Sig      lower     upper 
+## ----------------------------------------------------------------------------------------
+## (Intercept)    15.144         0.589                 25.702    0.000    13.906    16.382 
+##      linear     3.523         0.264        0.953    13.369    0.000     2.969     4.076 
+## ----------------------------------------------------------------------------------------
+\end{verbatim}
+
+These are the results of the liner model. The model testing the linear
+relationship between practice and score explained 90.9\% of the variance
+in score, and the linear trend was statistically significant at
+p\textless{}0.001. This model fits the data pretty well, but since we
+observed a potential curved relationship when we plotted the data, there
+could be a better way to examine this relationship.
+
+\subsection{Run model with the linear and quadratic
+effects}\label{run-model-with-the-linear-and-quadratic-effects}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m4 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(score }\OperatorTok{~}\StringTok{ }\NormalTok{linear }\OperatorTok{+}\StringTok{ }\NormalTok{quadratic, }\DataTypeTok{data =}\NormalTok{ cog)}
+\KeywordTok{ols_regress}\NormalTok{(m4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                         
+## -------------------------------------------------------------
+## R                       0.990       RMSE               1.274 
+## R-Squared               0.980       Coef. Var          8.411 
+## Adj. R-Squared          0.977       MSE                1.623 
+## Pred R-Squared          0.972       MAE                0.944 
+## -------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                 
+## ---------------------------------------------------------------------
+##                 Sum of                                               
+##                Squares        DF    Mean Square       F         Sig. 
+## ---------------------------------------------------------------------
+## Regression    1338.373         2        669.187    412.425    0.0000 
+## Residual        27.584        17          1.623                      
+## Total         1365.957        19                                     
+## ---------------------------------------------------------------------
+## 
+##                                   Parameter Estimates                                    
+## ----------------------------------------------------------------------------------------
+##       model      Beta    Std. Error    Std. Beta      t        Sig      lower     upper 
+## ----------------------------------------------------------------------------------------
+## (Intercept)    15.144         0.285                 53.168    0.000    14.543    15.745 
+##      linear     3.523         0.127        0.953    27.655    0.000     3.254     3.791 
+##   quadratic    -2.207         0.285       -0.267    -7.748    0.000    -2.808    -1.606 
+## ----------------------------------------------------------------------------------------
+\end{verbatim}
+
+These are the results of the quadratic model. The model testing the
+linear relationship between practice and score explained 98.0\% of the
+variance in score, which is 7.1\% higher than the model that only tested
+the linear relationship. The quadratic term (named quadratic) is
+statistically significant, indicating that there is a substantial curve
+to the relationship between practice and score (i.e., it's not linear).
+We need to maintain the quadratic term in the model.
+
+\subsection{Run model with the linear, quadratic, and cubic
+effects}\label{run-model-with-the-linear-quadratic-and-cubic-effects}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m5 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(score }\OperatorTok{~}\StringTok{ }\NormalTok{linear }\OperatorTok{+}\StringTok{ }\NormalTok{quadratic }\OperatorTok{+}\StringTok{ }\NormalTok{cubic, }\DataTypeTok{data =}\NormalTok{ cog)}
+\KeywordTok{ols_regress}\NormalTok{(m5)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Model Summary                         
+## -------------------------------------------------------------
+## R                       0.990       RMSE               1.309 
+## R-Squared               0.980       Coef. Var          8.641 
+## Adj. R-Squared          0.976       MSE                1.712 
+## Pred R-Squared          0.969       MAE                0.954 
+## -------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                 ANOVA                                 
+## ---------------------------------------------------------------------
+##                 Sum of                                               
+##                Squares        DF    Mean Square       F         Sig. 
+## ---------------------------------------------------------------------
+## Regression    1338.559         3        446.186    260.572    0.0000 
+## Residual        27.397        16          1.712                      
+## Total         1365.957        19                                     
+## ---------------------------------------------------------------------
+## 
+##                                   Parameter Estimates                                    
+## ----------------------------------------------------------------------------------------
+##       model      Beta    Std. Error    Std. Beta      t        Sig      lower     upper 
+## ----------------------------------------------------------------------------------------
+## (Intercept)    15.144         0.293                 51.755    0.000    14.524    15.764 
+##      linear     3.523         0.131        0.953    26.921    0.000     3.245     3.800 
+##   quadratic    -2.207         0.293       -0.267    -7.542    0.000    -2.827    -1.586 
+##       cubic     0.043         0.131        0.012     0.330    0.746    -0.234     0.321 
+## ----------------------------------------------------------------------------------------
+\end{verbatim}
+
+These are the results of the cubic model. We are testing the cubic term
+to determine if there is a second bend to the relationship between
+practice and score. Since we have at least four levels of our
+categorical predictor, we can test the cubic trend using polynomial
+contrasts. This model explains the same amount of variance in score as
+the previous model that only included the linear and quadratic effects
+(i.e., adding the cubic effect does not increase the explanatory power
+of the model). The cubic term (practice3) is not significant, indicating
+that there is not a second bend to the relationship. Therefore, the
+quadratic model is the best fit for these data.
+
+\section{Do it yourself activity}\label{do-it-yourself-activity}
+
+\subsection{Load packages}\label{load-packages}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tsibble)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'tsibble' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'tsibble'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     id
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidycovid19)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Download data}\label{download-data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid <-}\StringTok{ }\KeywordTok{download_merged_data}\NormalTok{(}\DataTypeTok{cached =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Downloading cached version of merged data...done. Timestamp is 2020-05-11 09:28:20
+\end{verbatim}
+
+\subsection{Recode lockdown variable}\label{recode-lockdown-variable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(covid, }\DataTypeTok{lockdown =} \KeywordTok{ifelse}\NormalTok{(lockdown }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, lockdown))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Dummy code/factor income \&
+lockdown}\label{dummy-codefactor-income-lockdown}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(covid, }
+                
+               \DataTypeTok{lowmid =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Lower middle income"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+               \DataTypeTok{upmid  =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Upper middle income"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+               \DataTypeTok{high   =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "High income"}\NormalTok{        , }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+               
+               \DataTypeTok{income =} \KeywordTok{factor}\NormalTok{(income, }
+                                \DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Low income"}\NormalTok{, }\StringTok{"Lower middle income"}\NormalTok{, }\StringTok{"Upper middle income"}\NormalTok{, }\StringTok{"High income"}\NormalTok{),}
+                                \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{)),}
+               
+               \DataTypeTok{income =} \KeywordTok{factor}\NormalTok{(income, }
+                                \DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Low income"}\NormalTok{, }\StringTok{"Lower middle income"}\NormalTok{, }\StringTok{"Upper middle income"}\NormalTok{, }\StringTok{"High income"}\NormalTok{),}
+                                \DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{))        }
+\NormalTok{                                )}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Describe data}\label{describe-data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select_if}\NormalTok{(is.numeric) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{describe}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                        vars     n        mean           sd     median
+## confirmed                 1 20240     5472.16     42543.85       9.00
+## deaths                    2 20240      362.79      2945.70       0.00
+## recovered                 3 20240     1563.10     10132.49       0.00
+## ecdc_cases                4 13561     8081.32     51559.70     122.00
+## ecdc_deaths               5 13561      536.16      3564.88       2.00
+## total_tests               6  4171   170407.15    584684.23   31134.00
+## soc_dist                  7 19910        2.77         3.86       1.00
+## mov_rest                  8 19910        4.07         5.74       2.00
+## pub_health                9 19910        6.26        10.61       3.00
+## gov_soc_econ             10 19910        3.40         6.68       1.00
+## lockdown                 11 19910        0.28         0.46       0.00
+## apple_mtr_driving        12  6669       77.48        35.28      82.54
+## apple_mtr_walking        13  6669       76.08        40.19      74.95
+## apple_mtr_transit        14  2952       66.63        40.67      63.55
+## gcmr_retail_recreation   15  9939      -32.74        31.38     -29.00
+## gcmr_grocery_pharmacy    16  9905      -16.47        23.91      -9.00
+## gcmr_parks               17  9870      -17.03        32.17     -12.00
+## gcmr_transit_stations    18  9909      -34.07        31.04     -34.00
+## gcmr_workplaces          19  9970      -24.93        28.23     -21.00
+## gcmr_residential         20  9753       12.39        11.93      11.00
+## gtrends_score            21  6497       29.63        25.24      22.00
+## gtrends_country_score    22  6677       40.41        22.97      41.00
+## population               23 21029 41248698.93 151750786.42 8882800.00
+## land_area_skm            24 20807   685062.49   1883748.13  120340.00
+## pop_density              25 20807      324.59      1526.98      85.69
+## pop_largest_city         26 16514  4472832.12   6046802.94 2081624.00
+## life_expectancy          27 20344       72.69         7.55      74.28
+## gdp_capita               28 20472    17029.04     25988.48    6744.50
+## lowmid                   29 21029        0.22         0.42       0.00
+## upmid                    30 21029        0.28         0.45       0.00
+## high                     31 21029        0.34         0.48       0.00
+##                            trimmed         mad       min          max
+## confirmed                   298.98       13.34      0.00 1.329260e+06
+## deaths                        6.31        0.00      0.00 7.952600e+04
+## recovered                    44.21        0.00      0.00 2.161690e+05
+## ecdc_cases                  860.83      177.91      1.00 1.329799e+06
+## ecdc_deaths                  20.09        2.97      0.00 7.952800e+04
+## total_tests               60213.79    43991.71      1.00 8.709630e+06
+## soc_dist                      2.06        1.48    -11.00 3.500000e+01
+## mov_rest                      2.94        2.97      0.00 5.100000e+01
+## pub_health                    3.98        4.45      0.00 1.180000e+02
+## gov_soc_econ                  1.83        1.48     -1.00 6.600000e+01
+## lockdown                      0.22        0.00     -3.00 1.000000e+00
+## apple_mtr_driving            77.70       42.19      8.74 1.863400e+02
+## apple_mtr_walking            74.55       49.22      5.82 3.625000e+02
+## apple_mtr_transit            65.93       59.18      7.04 1.605600e+02
+## gcmr_retail_recreation      -31.33       41.51    -97.00 6.000000e+01
+## gcmr_grocery_pharmacy       -13.99       20.76    -98.00 7.600000e+01
+## gcmr_parks                  -17.06       26.69    -95.00 1.880000e+02
+## gcmr_transit_stations       -33.23       44.48   -100.00 3.700000e+01
+## gcmr_workplaces             -23.46       35.58    -92.00 5.600000e+01
+## gcmr_residential             11.31       14.83     -6.00 5.500000e+01
+## gtrends_score                26.39       23.72      0.50 1.000000e+02
+## gtrends_country_score        39.92       22.24      1.00 1.000000e+02
+## population             15150452.29 12268292.61  29802.00 1.392730e+09
+## land_area_skm            270390.60   177511.70      2.00 1.637687e+07
+## pop_density                 119.01       89.99      0.14 1.919600e+04
+## pop_largest_city        3066580.25  1711037.53 342577.00 3.746830e+07
+## life_expectancy              73.21        6.98     52.80 8.542000e+01
+## gdp_capita                11523.88     8223.47    210.80 1.958796e+05
+## lowmid                        0.15        0.00      0.00 1.000000e+00
+## upmid                         0.22        0.00      0.00 1.000000e+00
+## high                          0.31        0.00      0.00 1.000000e+00
+##                               range  skew kurtosis         se
+## confirmed              1.329260e+06 19.83   488.39     299.04
+## deaths                 7.952600e+04 14.62   274.55      20.71
+## recovered              2.161690e+05 10.15   126.50      71.22
+## ecdc_cases             1.329798e+06 16.46   333.92     442.76
+## ecdc_deaths            7.952800e+04 12.05   186.59      30.61
+## total_tests            8.709629e+06  8.25    83.71    9053.18
+## soc_dist               4.600000e+01  2.14     8.44       0.03
+## mov_rest               5.100000e+01  2.46     9.41       0.04
+## pub_health             1.180000e+02  4.17    27.34       0.08
+## gov_soc_econ           6.700000e+01  3.74    19.34       0.05
+## lockdown               4.000000e+00  0.74     0.09       0.00
+## apple_mtr_driving      1.776000e+02 -0.08    -1.10       0.43
+## apple_mtr_walking      3.566800e+02  0.34    -0.31       0.49
+## apple_mtr_transit      1.535200e+02  0.07    -1.52       0.75
+## gcmr_retail_recreation 1.570000e+02 -0.24    -1.37       0.31
+## gcmr_grocery_pharmacy  1.740000e+02 -0.88     0.46       0.24
+## gcmr_parks             2.830000e+02  0.39     1.95       0.32
+## gcmr_transit_stations  1.370000e+02 -0.12    -1.41       0.31
+## gcmr_workplaces        1.480000e+02 -0.32    -1.19       0.28
+## gcmr_residential       6.100000e+01  0.56    -0.71       0.12
+## gtrends_score          9.950000e+01  0.91    -0.07       0.31
+## gtrends_country_score  9.900000e+01  0.16    -0.31       0.28
+## population             1.392700e+09  7.95    66.35 1046457.61
+## land_area_skm          1.637687e+07  5.33    32.44   13059.25
+## pop_density            1.919586e+04 10.77   124.83      10.59
+## pop_largest_city       3.712573e+07  2.68     8.26   47054.34
+## life_expectancy        3.261000e+01 -0.58    -0.48       0.05
+## gdp_capita             1.956688e+05  3.20    14.40     181.64
+## lowmid                 1.000000e+00  1.34    -0.20       0.00
+## upmid                  1.000000e+00  1.00    -1.00       0.00
+## high                   1.000000e+00  0.66    -1.57       0.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(covid}\OperatorTok{$}\NormalTok{income)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##          Low income Lower middle income Upper middle income         High income 
+##                3330                4662                5803                7234
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(covid}\OperatorTok{$}\NormalTok{lockdown)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##    -3    -2    -1     0     1 
+##     8     2    45 14292  5563
+\end{verbatim}
+
+\subsection{Run dummy model}\label{run-dummy-model}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cov_dum <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(confirmed }\OperatorTok{~}\StringTok{  }\NormalTok{lockdown }\OperatorTok{+}\StringTok{ }\NormalTok{lowmid }\OperatorTok{+}\StringTok{ }\NormalTok{upmid }\OperatorTok{+}\StringTok{ }\NormalTok{high }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{lowmid }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{upmid }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{high, }
+              \DataTypeTok{data =}\NormalTok{ covid)}
+\KeywordTok{ols_regress}\NormalTok{(cov_dum)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             Model Summary                              
+## ----------------------------------------------------------------------
+## R                       0.160       RMSE                    42575.224 
+## R-Squared               0.026       Coef. Var                 757.266 
+## Adj. R-Squared          0.025       MSE                1812649703.051 
+## Pred R-Squared          0.025       MAE                      8733.648 
+## ----------------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                        ANOVA                                         
+## ------------------------------------------------------------------------------------
+##                         Sum of                                                      
+##                        Squares           DF         Mean Square      F         Sig. 
+## ------------------------------------------------------------------------------------
+## Regression    939255191603.328            7    134179313086.190    74.024    0.0000 
+## Residual          3.567657e+13        19682      1812649703.051                     
+## Total             3.661583e+13        19689                                         
+## ------------------------------------------------------------------------------------
+## 
+##                                          Parameter Estimates                                          
+## -----------------------------------------------------------------------------------------------------
+##           model         Beta    Std. Error    Std. Beta      t        Sig         lower        upper 
+## -----------------------------------------------------------------------------------------------------
+##     (Intercept)       52.624       812.330                  0.065    0.948    -1539.612     1644.861 
+##        lockdown      145.458      1963.204        0.072     0.074    0.941    -3702.587     3993.504 
+##          lowmid      697.896      1074.999        0.006     0.649    0.516    -1409.192     2804.984 
+##           upmid     2305.667      1067.656        0.041     2.160    0.031      212.971     4398.363 
+##            high     9093.618      1040.153        0.142     8.743    0.000     7054.831    11132.405 
+## lockdown:lowmid     -195.375      2392.770       -0.001    -0.082    0.935    -4885.407     4494.658 
+##  lockdown:upmid     5599.896      2283.435        0.028     2.452    0.014     1124.171    10075.622 
+##   lockdown:high    15140.996      2304.139        0.074     6.571    0.000    10624.689    19657.302 
+## -----------------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\subsection{Effect coding variables}\label{effect-coding-variables}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(covid,}
+              
+               \DataTypeTok{lowmid =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Lower middle income"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+               \DataTypeTok{upmid  =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Upper middle income"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+               \DataTypeTok{high   =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "High income"}\NormalTok{        , }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{),}
+              
+              \DataTypeTok{lowmid =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{, (}\OperatorTok{-}\DecValTok{1}\NormalTok{), lowmid),}
+              \DataTypeTok{upmid  =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{, (}\OperatorTok{-}\DecValTok{1}\NormalTok{), upmid ),}
+              \DataTypeTok{high   =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{, (}\OperatorTok{-}\DecValTok{1}\NormalTok{), high  )}
+\NormalTok{              ) }
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Run effect model}\label{run-effect-model}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cov_eff <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(confirmed }\OperatorTok{~}\StringTok{  }\NormalTok{lockdown }\OperatorTok{+}\StringTok{ }\NormalTok{lowmid }\OperatorTok{+}\StringTok{ }\NormalTok{upmid }\OperatorTok{+}\StringTok{ }\NormalTok{high }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{lowmid }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{upmid }\OperatorTok{+}\StringTok{ }\NormalTok{lockdown}\OperatorTok{*}\NormalTok{high, }
+              \DataTypeTok{data =}\NormalTok{ covid)}
+\KeywordTok{ols_regress}\NormalTok{(cov_eff)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             Model Summary                              
+## ----------------------------------------------------------------------
+## R                       0.160       RMSE                    42575.224 
+## R-Squared               0.026       Coef. Var                 757.266 
+## Adj. R-Squared          0.025       MSE                1812649703.051 
+## Pred R-Squared          0.025       MAE                      8733.648 
+## ----------------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                        ANOVA                                         
+## ------------------------------------------------------------------------------------
+##                         Sum of                                                      
+##                        Squares           DF         Mean Square      F         Sig. 
+## ------------------------------------------------------------------------------------
+## Regression    939255191603.203            7    134179313086.172    74.024    0.0000 
+## Residual          3.567657e+13        19682      1812649703.051                     
+## Total             3.661583e+13        19689                                         
+## ------------------------------------------------------------------------------------
+## 
+##                                          Parameter Estimates                                          
+## -----------------------------------------------------------------------------------------------------
+##           model         Beta    Std. Error    Std. Beta      t        Sig         lower        upper 
+## -----------------------------------------------------------------------------------------------------
+##     (Intercept)     3076.920       358.614                  8.580    0.000     2374.005     3779.834 
+##        lockdown     5281.838       730.588        0.072     7.230    0.000     3849.823     6713.852 
+##          lowmid    -2326.399       613.576       -0.056    -3.792    0.000    -3529.059    -1123.739 
+##           upmid     -718.628       607.131       -0.009    -1.184    0.237    -1908.657      471.401 
+##            high     6069.323       582.772        0.138    10.415    0.000     4927.041     7211.604 
+## lockdown:lowmid    -5331.754      1212.167       -0.033    -4.399    0.000    -7707.704    -2955.804 
+##  lockdown:upmid      463.517      1101.686        0.003     0.421    0.674    -1695.881     2622.914 
+##   lockdown:high    10004.616      1123.032        0.066     8.909    0.000     7803.378    12205.855 
+## -----------------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(covid, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{as.numeric}\NormalTok{(income), }\DataTypeTok{y =}\NormalTok{ confirmed)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{color =} \StringTok{"grey"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"loess"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{color =} \StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 1610 rows containing non-finite values (stat_smooth).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 1
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 1610 rows containing missing values (geom_point).
+\end{verbatim}
+
+\includegraphics{lab_9_combined_files/figure-latex/unnamed-chunk-27-1.pdf}
+
+\subsection{Orthoganol polynomials}\label{orthoganol-polynomials}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(covid,}
+              
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{         , }\OperatorTok{-}\DecValTok{3}\NormalTok{, income ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Lower middle income"}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, linear   ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Upper middle income"}\NormalTok{,  }\DecValTok{1}\NormalTok{, linear   ),}
+              \DataTypeTok{linear =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "High income"}\NormalTok{        ,  }\DecValTok{3}\NormalTok{, linear   ),}
+              
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{         ,  }\DecValTok{1}\NormalTok{, income ),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Lower middle income"}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, quadratic),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Upper middle income"}\NormalTok{, }\OperatorTok{-}\DecValTok{1}\NormalTok{, quadratic),}
+              \DataTypeTok{quadratic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "High income"}\NormalTok{        ,  }\DecValTok{1}\NormalTok{, quadratic),}
+              
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Low income"}\NormalTok{         , }\OperatorTok{-}\DecValTok{1}\NormalTok{, income),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Lower middle income"}\NormalTok{,  }\DecValTok{3}\NormalTok{, cubic   ),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "Upper middle income"}\NormalTok{, }\OperatorTok{-}\DecValTok{3}\NormalTok{, cubic   ),}
+              \DataTypeTok{cubic =} \KeywordTok{ifelse}\NormalTok{(income }\OperatorTok{==}\StringTok{ "High income"}\NormalTok{        ,  }\DecValTok{1}\NormalTok{, cubic   )}
+\NormalTok{              )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cov_linear <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(confirmed }\OperatorTok{~}\StringTok{ }\NormalTok{linear, }\DataTypeTok{data =}\NormalTok{ covid)}
+\KeywordTok{ols_regress}\NormalTok{(cov_linear)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             Model Summary                              
+## ----------------------------------------------------------------------
+## R                       0.116       RMSE                    42602.595 
+## R-Squared               0.013       Coef. Var                 765.989 
+## Adj. R-Squared          0.013       MSE                1814981118.991 
+## Pred R-Squared          0.013       MAE                      9871.778 
+## ----------------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                         ANOVA                                         
+## -------------------------------------------------------------------------------------
+##                         Sum of                                                       
+##                        Squares           DF         Mean Square       F         Sig. 
+## -------------------------------------------------------------------------------------
+## Regression    489707601462.477            1    489707601462.477    269.814    0.0000 
+## Residual          3.613264e+13        19908      1814981118.991                      
+## Total             3.662235e+13        19909                                          
+## -------------------------------------------------------------------------------------
+## 
+##                                      Parameter Estimates                                       
+## ----------------------------------------------------------------------------------------------
+##       model        Beta    Std. Error    Std. Beta      t        Sig        lower       upper 
+## ----------------------------------------------------------------------------------------------
+## (Intercept)    4398.271       310.124                 14.182    0.000    3790.403    5006.139 
+##      linear    2314.230       140.888        0.116    16.426    0.000    2038.078    2590.383 
+## ----------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cov_quadratic <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(confirmed }\OperatorTok{~}\StringTok{ }\NormalTok{linear }\OperatorTok{+}\StringTok{ }\NormalTok{quadratic, }\DataTypeTok{data =}\NormalTok{ covid)}
+\KeywordTok{ols_regress}\NormalTok{(cov_quadratic)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             Model Summary                              
+## ----------------------------------------------------------------------
+## R                       0.125       RMSE                    42555.644 
+## R-Squared               0.016       Coef. Var                 765.144 
+## Adj. R-Squared          0.015       MSE                1810982818.472 
+## Pred R-Squared          0.015       MAE                      9081.882 
+## ----------------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                         ANOVA                                         
+## -------------------------------------------------------------------------------------
+##                         Sum of                                                       
+##                        Squares           DF         Mean Square       F         Sig. 
+## -------------------------------------------------------------------------------------
+## Regression    571116751002.141            2    285558375501.070    157.681    0.0000 
+## Residual          3.605123e+13        19907      1810982818.472                      
+## Total             3.662235e+13        19909                                          
+## -------------------------------------------------------------------------------------
+## 
+##                                      Parameter Estimates                                       
+## ----------------------------------------------------------------------------------------------
+##       model        Beta    Std. Error    Std. Beta      t        Sig        lower       upper 
+## ----------------------------------------------------------------------------------------------
+## (Intercept)    4570.961       310.851                 14.705    0.000    3961.667    5180.254 
+##      linear    2129.371       143.408        0.106    14.848    0.000    1848.279    2410.463 
+##   quadratic    2062.076       307.557        0.048     6.705    0.000    1459.239    2664.913 
+## ----------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cov_cubic <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(confirmed }\OperatorTok{~}\StringTok{ }\NormalTok{linear }\OperatorTok{+}\StringTok{ }\NormalTok{quadratic }\OperatorTok{+}\StringTok{ }\NormalTok{cubic, }\DataTypeTok{data =}\NormalTok{ covid)}
+\KeywordTok{ols_regress}\NormalTok{(cov_cubic)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             Model Summary                              
+## ----------------------------------------------------------------------
+## R                       0.125       RMSE                    42555.993 
+## R-Squared               0.016       Coef. Var                 765.151 
+## Adj. R-Squared          0.015       MSE                1811012528.146 
+## Pred R-Squared          0.015       MAE                      9073.583 
+## ----------------------------------------------------------------------
+##  RMSE: Root Mean Square Error 
+##  MSE: Mean Square Error 
+##  MAE: Mean Absolute Error 
+## 
+##                                         ANOVA                                         
+## -------------------------------------------------------------------------------------
+##                         Sum of                                                       
+##                        Squares           DF         Mean Square       F         Sig. 
+## -------------------------------------------------------------------------------------
+## Regression    572336333057.320            3    190778777685.773    105.344    0.0000 
+## Residual          3.605002e+13        19906      1811012528.146                      
+## Total             3.662235e+13        19909                                          
+## -------------------------------------------------------------------------------------
+## 
+##                                      Parameter Estimates                                       
+## ----------------------------------------------------------------------------------------------
+##       model        Beta    Std. Error    Std. Beta      t        Sig        lower       upper 
+## ----------------------------------------------------------------------------------------------
+## (Intercept)    4568.379       310.869                 14.696    0.000    3959.049    5177.708 
+##      linear    2135.283       143.590        0.107    14.871    0.000    1853.834    2416.732 
+##   quadratic    2024.949       310.869        0.047     6.514    0.000    1415.620    2634.278 
+##       cubic     110.214       134.304        0.006     0.821    0.412    -153.034     373.461 
+## ----------------------------------------------------------------------------------------------
+\end{verbatim}
+
+\end{document}

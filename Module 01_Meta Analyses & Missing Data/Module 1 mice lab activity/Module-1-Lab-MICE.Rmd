@@ -1,7 +1,9 @@
 ---
-title: "PSY 653 Module 1: Missing Data"
-subtitle: "Jan 29, 2020"
+title: 'PSY 653 Module 1: Missing Data'
+author: "Neil Yetz & Gemma Wallace"
+subtitle: Jan 29, 2020
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -35,7 +37,7 @@ imputed_data <- mice(mice_data1, m=5, maxit = 50, method = 'pmm', seed = 500)
 
 
 ## Regress X1 on X2 on imputed dataset using the "with" function
-```{r, results= hide}
+```{r}
 fit.mi <- with(imputed_data, exp= lm(X1 ~ X2))
 summary(fit.mi)
 ```
@@ -66,7 +68,7 @@ imputed_data <- mice(mice_data2, m=5, maxit = 50, method = 'pmm', seed = 500)
 ```
 
 ## Regress X1 on X2 on imputed dataset using the "with" function
-```{r, results= hide}
+```{r}
 fit.mi2 <- with(imputed_data, exp= lm(X1 ~ X2 + X3 + X4))
 summary(fit.mi2)
 ```

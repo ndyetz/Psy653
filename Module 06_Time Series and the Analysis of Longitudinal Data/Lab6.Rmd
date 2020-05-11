@@ -1,6 +1,9 @@
 ---
 title: "R Notebook"
-output: html_notebook
+author: "Neil Yetz & Gemma Wallace"
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 # Load Libraries

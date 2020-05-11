@@ -1,7 +1,10 @@
 ---
-title: "PSY 653 Module 3: Nested Designs"
-subtitle: "February 12, 2020"
-output: html_notebook
+title: 'PSY 653 Module 3: Nested Designs'
+author: "Neil Yetz & Gemma Wallace"
+subtitle: February 12, 2020
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 # Part 1: Demo of Nested ANOVAs
