@@ -1,0 +1,10 @@
+"0","ex <- read_csv(""RMexample.csv"")"
+"2","Parsed with column specification:
+cols(
+  Y = [32mcol_double()[39m,
+  Subject = [32mcol_double()[39m,
+  Passage = [31mcol_character()[39m,
+  Author = [31mcol_character()[39m,
+  Genre = [31mcol_character()[39m
+)
+"

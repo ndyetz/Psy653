@@ -1,0 +1,6 @@
+"0","dbx <- ((mean(males$X) - mean(females$X)) * sqrt((nrow(males) / nrow(nc))*(nrow(females) / nrow(nc)))) / sd(nc$X)"
+"0","dbx"
+"1","[1]"
+"1"," 0.02695824"
+"1","
+"

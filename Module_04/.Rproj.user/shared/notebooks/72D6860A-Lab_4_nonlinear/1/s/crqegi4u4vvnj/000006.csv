@@ -1,0 +1,6 @@
+"0","ggplot(cog, aes(x = practice, y = score)) +"
+"0","  geom_smooth(method = ""lm"", se = FALSE) +"
+"0","  geom_point() +"
+"0","  scale_x_continuous(limits=c(0,14), breaks = seq(0, 14, by = 2)) +"
+"0","  labs(title = ""Does more practice equal better score?"", subtitle = ""Overlay best fit straight line"", "
+"0","       x = ""Minutes Spent Practicing"", y = ""Score"")"

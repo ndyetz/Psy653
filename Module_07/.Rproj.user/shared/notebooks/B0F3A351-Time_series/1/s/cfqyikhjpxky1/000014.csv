@@ -1,0 +1,4 @@
+"0","count_ma = ts(na.omit(daily_data$cnt_ma), frequency=30) "
+"0","decomp = stl(count_ma, s.window=""periodic"")"
+"0","deseasonal_cnt <- seasadj(decomp)"
+"0","plot(decomp)  "

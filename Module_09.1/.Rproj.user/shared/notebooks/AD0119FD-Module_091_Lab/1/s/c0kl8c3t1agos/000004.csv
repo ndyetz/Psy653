@@ -1,0 +1,6 @@
+"0","nested_correlation <- dbx*dby + (cor_males * (nrow(males) / nrow(nc)) * lambda_mx*lambda_my) + (cor_females * (nrow(females) / nrow(nc)) * lambda_fx*lambda_fy)"
+"0","nested_correlation"
+"1","[1]"
+"1"," 0.6534351"
+"1","
+"

@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580241456357.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DCDC3CA7",
+    "lastKnownWriteTime" : 27303364806049904,
+    "last_content_update" : 1580241456357,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "C8FFABC9",
+        "caption" : "studies",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=studies&cache_key=C8FFABC9",
+        "displayedObservations" : "20",
+        "environment" : "",
+        "object" : "studies",
+        "preview" : "0",
+        "totalObservations" : "20",
+        "variables" : "3"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

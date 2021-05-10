@@ -1,0 +1,16 @@
+"0","dat <- read_csv(""forlab2.csv"")"
+"2","Parsed with column specification:
+cols(
+  att1 = [32mcol_double()[39m,
+  att2 = [32mcol_double()[39m,
+  att3 = [32mcol_double()[39m,
+  att4 = [32mcol_double()[39m,
+  att5 = [32mcol_double()[39m,
+  group1 = [32mcol_double()[39m,
+  group2 = [32mcol_double()[39m,
+  out1 = [32mcol_double()[39m,
+  out2 = [32mcol_double()[39m,
+  out3 = [32mcol_double()[39m,
+  out4 = [32mcol_double()[39m
+)
+"

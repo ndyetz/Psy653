@@ -1,0 +1,7 @@
+"0","retirement <- mutate(retirement,"
+"0","                     sex.f = factor(sex, "
+"0","                                       levels = c(1,2), "
+"0","                                       labels = c(""Female"", ""Male"")),"
+"0","                     occupation.f = factor(occupation, "
+"0","                                           levels = c(1,2,3,4,5,6), "
+"0","                                           labels = c(""Prof"", ""Manag"", ""nonmanual"", ""Skilled"", ""Semi-Skilled"", ""Unskilled"")))"

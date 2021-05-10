@@ -1,0 +1,86 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+
+
+# Try it yourself
+## 1a 
+```{r}
+dfhyp=1					
+dferr=230
+alpha=.05
+effect=.01					#enter the minimum effect you are testing
+sse=100					
+mse=(((1/effect)-1)*sse)/dferr
+noncen=sse/mse
+qf((1-alpha),dfhyp,dferr,noncen)
+```
+
+## 1b
+compared to nill = 3.88
+compared to 1% = 9.58
+
+## 1c
+At Nil the needed sample size is 71 (dferror = n - 1)
+At 1% The needed samples size is 121 (dferror = n - 1)
+
+
+## Part 2
+```{r,message=FALSE}
+slp <- read_csv("slpdata.csv")
+```
+
+### Factor categorical predictors
+```{r}
+slp <- mutate(slp, 
+             sex.f = factor(sex, levels = c(1,2), labels = c("male", "female")),
+             cond.f = factor(cond,  levels = c(1,2,3), labels= c("selfhelp", "group", "group_and_partner"))
+             ) 
+```
+
+### Frequentist ANOVA
+```{r}
+anova <- aov(sleep ~ sex.f*cond.f, data=slp)
+summary(anova)
+```
+
+#### Eta squared calculations
+```{r}
+sex   <-  16182/ (46531 + 16182 + 24971 + 593)
+condition    <- 24971 / (46531 + 16182 + 24971 + 593)
+interaction     <-  593 / (46531 + 16182 + 24971 + 593)
+
+sex
+condition
+interaction
+```
+
+## Bayesian ANOVA with all models
+```{r}
+Bayesm1 <- anovaBF(sleep ~ sex.f*cond.f, data=slp,whichModels = 'all')
+Bayesm1
+plot(Bayesm1)
+```
+
+
+## Bayesian ANOVA top-down approach
+```{r}
+Bayesm2 <- anovaBF(sleep ~ sex.f*cond.f, data=slp, whichModels = "top")
+Bayesm2
+plot(Bayesm2)
+```
+
+
+## Bayesian ANOVA bottom-up approch
+```{r}
+Bayesm3 <- anovaBF(sleep ~ sex.f*cond.f, data=slp,whichModels = "bottom")
+Bayesm3
+plot(Bayesm3)
+
+```
+
+

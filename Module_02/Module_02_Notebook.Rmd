@@ -1,0 +1,66 @@
+---
+title: "Polynomial Contrasts"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+# Load Libraries
+```{r}
+library(psych)
+library(olsrr)
+library(tidyverse)
+```
+
+# Read in data
+```{r}
+cog <- read_csv("cogtest.csv")
+```
+# Filter Practice
+```{r}
+cog <- filter(cog, practice == 0 | practice == 4 | practice == 8 | practice == 12)
+```
+
+# Visualize the data
+```{r}
+ggplot(cog, aes(x = practice, y = score)) +
+  geom_point() + 
+  geom_smooth(method = "loess")
+```
+
+```{r}
+cog <- mutate(cog, 
+              
+              linear = ifelse(practice == 0, -3, NA),
+              linear = ifelse(practice == 4, -1, linear),
+              linear = ifelse(practice == 8,  1, linear),
+              linear = ifelse(practice == 12, 3, linear),
+              
+              quadratic = ifelse(practice == 0, 1, NA),
+              quadratic = ifelse(practice == 4, -1, quadratic),
+              quadratic = ifelse(practice == 8, -1, quadratic),
+              quadratic = ifelse(practice == 12, 1, quadratic),
+              
+              cubic = ifelse(practice == 0, -1, NA),
+              cubic = ifelse(practice == 4, 3, cubic),
+              cubic = ifelse(practice == 8, -3, cubic),
+              cubic = ifelse(practice == 12, 1, cubic)
+              )
+```
+
+
+
+```{r}
+m3 <- lm(score ~ linear, data = cog)
+ols_regress(m3)
+```
+```{r}
+m4 <- lm(score ~ linear + quadratic, data = cog)
+ols_regress(m4)
+```
+
+```{r}
+m5 <- lm(score ~ linear + quadratic + cubic, data = cog)
+ols_regress(m5)
+```
+

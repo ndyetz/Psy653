@@ -1,0 +1,2 @@
+"0","ggplot(covid, aes(x = date, y = new_cases)) +"
+"0","  geom_line()"

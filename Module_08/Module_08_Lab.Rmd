@@ -1,0 +1,152 @@
+---
+title: "Random coefficient model"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+# Load libraries
+```{r}
+
+#install.packages("lme4")
+#install.packages("lmerTest")
+
+library(lme4)
+library(lmerTest)
+library(psych)
+library(olsrr)
+library(tidyverse)
+```
+
+
+# Demo Activity
+
+# read in data
+```{r}
+grow_wide <- read_csv("mlm_grow.csv")
+```
+# Learn to pivot tables
+We will turn this dataset from wide to long
+```{r}
+grow_long <- pivot_longer(grow_wide, 
+                          cols = perf_0:perf_6, 
+                          names_to = "week", 
+                          names_prefix = "perf_", 
+                          values_to = "perform")
+
+# Turn week into a numeric variable
+grow_long <- mutate(grow_long, week = as.numeric(week))
+
+```
+
+# Describe data
+```{r}
+describe(grow_long)
+```
+# Plot the change in performance
+```{r}
+ggplot(grow_long, aes(y = perform, color = factor(kid_id))) +
+  geom_boxplot() +
+  theme(legend.position = "none") + 
+  labs(title = "How much do subjects vary across week and between eachother")
+```
+
+
+```{r}
+grouped_weektx <- group_by(grow_long, week, txcond)
+mean_perftx <- summarize(grouped_weektx, perform = mean(perform, na.rm = TRUE))
+mean_perftx <- ungroup(mean_perftx)
+
+
+ggplot(mean_perftx, aes(x = week, y = perform, color = as.factor(txcond))) +
+  geom_line() +
+  scale_x_continuous(limits = c(0,6), breaks = seq(0,6, by = 1)) +
+  labs(title = "Does performance change across week?", subtitle = "Separated by treatment condition", 
+       y = "Performance", color = "Treatment condition")
+```
+
+
+
+
+
+
+
+
+# Plot models
+#First with just a random intercept
+```{r}
+growmod1 <- lmer(perform ~  (1|kid_id), data = grow_long, REML = FALSE)
+summary(growmod1)
+```
+
+# Add a fixed slope
+```{r}
+
+growmod2 <- lmer(perform ~  txcond + (1|kid_id), data = grow_long, REML = FALSE)
+summary(growmod2)
+```
+
+# Add a random slope
+```{r}
+growmod3 <- lmer(perform ~  txcond + (1 + week|kid_id), data = grow_long, REML = FALSE)
+summary(growmod3)
+```
+
+# Hierarchical regression to compare models
+```{r}
+anova(growmod1, growmod2, growmod3)
+```
+
+# Try it yourself
+
+
+# Read in data
+```{r}
+longitudinal_wide <- read_csv("Longitudinal_wide.csv")
+```
+
+
+# Make data wide then long again
+```{r}
+
+#longitudinal <- select(longitudinal, student, sex, job, everything())
+#longitudinal_wide <- pivot_wider(longitudinal_wide, id_cols = student:job, names_from = occas, names_prefix = "occas_", values_from = gpa)
+
+longitudinal_long <- pivot_longer(longitudinal_wide, cols = occas_0:occas_5, names_to = "occas", names_prefix = "occas_", values_to = "gpa")
+
+longitudinal_long <- mutate(longitudinal_long, occas = as.numeric(occas))
+
+```
+
+```{r}
+#write_csv(longitudinal_wide, "longitudinal_wide.csv", na = "")
+```
+
+
+# Describe data 
+```{r}
+describe(longitudinal_long)
+```
+
+
+
+```{r}
+mod1 <- lmer(gpa ~ 1 + (1|student), data = longitudinal_long, REML = FALSE)
+summary(mod1)
+```
+
+
+```{r}
+mod2 <- lmer(gpa ~ 1 + sex + (1|student), data = longitudinal_long, REML = FALSE)
+summary(mod2)
+```
+
+```{r}
+mod3 <- lmer(gpa ~ sex + (1 + occas|student), data = longitudinal_long, REML = FALSE)
+summary(mod3)
+```
+
+```{r}
+anova(mod1, mod2, mod3)
+```
+

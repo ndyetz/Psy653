@@ -1,0 +1,100 @@
+---
+title: "BAC Logistic Regression Unit 11"
+output: html_notebook
+---
+# Load libraries
+```{r,message=FALSE}
+library(tidyverse)
+library(psych)
+library(olsrr)
+```
+
+# Data prep
+```{r, message=FALSE}
+#obs <- read_csv("bac_obs.csv")
+# Create dichotomized versions of bac (>.08 vs. <= .08) and typ_drks (> average of 2 per day vs. <= average of 2 per day)
+#obs <- mutate(obs, bac_over = ifelse(bac > .08, 1, 0))
+#table(obs$bac_over)
+#describe(obs$weight)
+#obs <- mutate(obs, weight_low = ifelse(weight <= 58.54, 1, 0))
+#write_csv(obs, "bac_module10.csv")
+```
+
+# Import data
+```{r,message=FALSE}
+bac <- read_csv("bac_module5.csv")
+```
+
+
+
+# Use Logistic Regression to predict bac_over with alcexp, pmood, weight_low, and typ_drks
+```{r}
+logreg_mod <- glm(bac_over ~ alcexp + pmood + weight_low + typ_drks, data = bac)
+summary(logreg_mod)
+```
+
+The model above displays the log odds of each predictor variable (While controlling for all other predictors in the model) on the outcome of bac_over. We can see that all of the predictors statistically significant. However, to have a better interpretation of each with odds ratios, we need to exponentiate the coefficients.
+
+## Exponentiate coefficients to get odds ratios and confidence intervals
+```{r,message=FALSE}
+exp(coefficients(logreg_mod))
+exp(confint(logreg_mod))
+```
+
+Intercept: When all of the X variables are zero, the odds of having a bac greater than 0.08 are 0.41 times as likely. Or we can take the inverse and state the they are 2.43 times as likely NOT to develop the outcome of bac over 0.08 (calculated by dividing 1/0.41). The confidence interval does not include 1, indicating that this is statistically significant.
+
+alcexp (continuous): for every one-unit increase in alcexp, the odds of having a bac > 0.08 increased by 1.12. In other words, for every one-unit increase in alcexp, participants are 1.12 times more likely to have a bac > 0.08.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+pmood (continuous): when controlling for alcexp, for every one-unit increase in pmood, the odds of hacing a bac > 0.08 increased by 1.05. In other words, for every one-unit increase in pmood, participants are 1.05 times more likely to have bac > 0.08.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+weight_low (binary): when controlling for alcexp and pmood, participants with lower body weight (coded as 1) wre 1.23 times as likely to have a bac > 0.08 than participants who did not have lower body weight.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+typ_drks (continuous): when controlling for alcexp, pmood, and weight_low, for a one-unit increase in typ_drks the odds of having a bac > 0.08 increase by 1.015. In other wors, for every one-unit increase in typ_drks, participants are 1.015 times as likely to have a bac > 0.08. The confidence interval does not include 1, indicating that this is statistically significant.
+
+## Deviance testing
+```{r}
+anova(logreg_mod,test="Chisq")
+```
+The difference between the deviance for each model and the null is one measure of model fit. These comparisons tell us whether adding information to a null model will lead to better prediction. Each row in the deviance table compares that model to the null model.
+alcexp = model with just alcecp
+pmood = model wth alcexp + pmood
+weight_low = model with alcexp + pmood + weight_low
+typ_drks = model with alcexp + pmood + weight_low + typ_drks
+
+In this case, adding each variable adds to the predictive power of the model (i.e., reducing model deviance). 
+
+## Calculate McFadden's R^2 from deviance table
+This serves as an effect size!
+McFadden R2 =  1-(Deviance model/Deviance Null)
+```{r}
+# get the null deviance from the original model output
+# get the deviance for each model from the residual deviance column of the devaince table
+
+m1_mcfaddens <- 1-(39.374/49.755)
+m1_mcfaddens
+
+m2_mcfaddens  <- 1-(38.436/49.755)
+m2_mcfaddens
+
+m3_mcfaddens <- 1-(37.626/49.755)
+m3_mcfaddens
+
+m4_mcfadens <- 1-(31.295/49.755)
+m4_mcfadens
+```
+
+Now we can compare the McFadden's R^2 to answer the same questions we asked about with hierarchical regression the the OLS models.
+
+Model 1 vs  Model 2: 
+McFaddens R^2 increases from 0.209 to 0.228, indicating that adding pmood when controlling for alc_exp does not add much explained variance (~2%) to the model.
+
+Model 2 vs. Model 3: 
+R^2 increases from 0.228 to 0.244, indicating that adding weight_low when controlling for alcexp and pmood does not add much explained variance (~2%) to the model
+
+Mode 3 vs. Model 4: 
+R^2 increases frorm 0.244 to 0.371, indicating that about 13% additional varince in bac_over is explained when you add typ_drks to the model while controlling for alc_exp, pmood, and weight_low.
+
+Note, these values are essentially identical to what we got from the R^2 vaues in the OLS models above!
+
+# Compare conclusions from the OLS vs. logistic regression analyses
+We get similar conclusions between the 2 analysis aproaches.

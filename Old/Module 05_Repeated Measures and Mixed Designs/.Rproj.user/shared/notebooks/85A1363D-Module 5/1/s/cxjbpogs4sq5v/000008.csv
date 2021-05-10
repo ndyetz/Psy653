@@ -1,0 +1,11 @@
+"0","ezANOVA("
+"0","        data=ex,"
+"0","        dv=Y,"
+"0","        wid=Subject, "
+"0","        within= Passage,"
+"0","        between = .(Author, Genre),"
+"0","        detailed=TRUE,"
+"0","        type = 3"
+"0","        )"
+"1","$ANOVA
+"

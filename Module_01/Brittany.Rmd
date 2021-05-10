@@ -1,0 +1,81 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+# Load Libraries
+```{r}
+library(psych)
+library(tidyverse)
+```
+
+# Read in data
+```{r}
+orgs <- read_csv("Nested_Brittany.csv")
+```
+
+
+# Describe data
+```{r}
+describe(orgs)
+```
+
+
+# Visualize data
+## Boxplot of Organization
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Org)) +
+  geom_boxplot()
+```
+
+
+## Boxplot of Department
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Dept)) +
+  geom_boxplot()
+```
+
+
+# Boxplot of Department faceted by organization
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Dept)) +
+  geom_boxplot() +
+  facet_wrap(~Org)
+```
+
+
+
+## Boxplot of Condition
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Condition)) +
+  geom_boxplot()
+```
+### Condition faceted by Org
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Condition)) +
+  geom_boxplot() +
+  facet_wrap(~Org)
+```
+
+### Condition faceted by Org and Dept.
+```{r}
+ggplot(orgs, aes(y = Productivity, color = Condition)) +
+  geom_boxplot() +
+  facet_wrap(vars(Org, Dept))
+```
+
+
+# Run ANOVA
+```{r}
+mod1 <- lm(Productivity ~ Org + Org/Dept + Org/Condition + Org/Dept*Org/Condition, data = orgs)
+anova(mod1)
+
+```
+## Alternatively, it can be written as so:
+```{r}
+mod2 <- lm(Productivity ~ Org + Org/Dept + Org/Condition + Org/(Dept*Condition), data = orgs)
+anova(mod2)
+```
+

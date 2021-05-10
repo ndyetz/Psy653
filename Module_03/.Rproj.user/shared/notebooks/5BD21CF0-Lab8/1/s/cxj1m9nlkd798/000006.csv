@@ -1,0 +1,4 @@
+"0","summary(fitmed)"
+"1","Call: "
+"1","psych::mediate(y = lifesat ~ hygiene + (sleep), data = slp)
+"

@@ -1,0 +1,18 @@
+"0","org <- read_csv(""orgdata.csv"")"
+"2","Parsed with column specification:
+cols(
+  nemploy = [32mcol_double()[39m,
+  nmale = [32mcol_double()[39m,
+  Country = [32mcol_double()[39m,
+  HPD = [32mcol_double()[39m,
+  HCollect = [32mcol_double()[39m,
+  HMF = [32mcol_double()[39m,
+  HUA = [32mcol_double()[39m,
+  HLong = [32mcol_double()[39m,
+  Hind = [32mcol_double()[39m,
+  SelfRating = [32mcol_double()[39m,
+  PeerRating = [32mcol_double()[39m,
+  Pay = [32mcol_double()[39m,
+  Develop = [32mcol_double()[39m
+)
+"

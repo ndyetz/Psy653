@@ -1,0 +1,44 @@
+---
+title: "Lab 1: Missing Data & Meta-Analyses"
+output: html_notebook
+---
+
+
+# Load Libraries
+```{r}
+library(tidyverse)
+library(mice)
+library(olsrr)
+```
+
+# Read in data
+```{r}
+lab_data <- read_csv("lab_data.csv")
+```
+
+# Simple Linear regression model X1 ~ X2
+```{r}
+mod1 <- lm(X1 ~ X2, data = lab_data)
+ols_regress(mod1)
+```
+
+# impute the dataset 5 times (using mice)
+```{r}
+imputed_data <- mice(lab_data, m=5, maxit = 50, method = 'pmm', seed = 500)
+```
+
+
+# Regress X1 on X2 on imputed dataset using the "with" function
+```{r, results= hide}
+fit.mi <- with(imputed_data, exp= lm(X1 ~ X2))
+```
+
+
+```{r}
+combimp <- pool(fit.mi)
+```
+
+```{r}
+summary(combimp)
+```
+

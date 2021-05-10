@@ -1,0 +1,270 @@
+---
+title: "PSY 653 Module 3: Nested Designs"
+subtitle: "February 12, 2020"
+output: html_notebook
+---
+```{r}
+rm(list = ls())
+```
+
+# Part 1: Demo of Nested ANOVAs
+
+## Load libraries
+```{r, message=FALSE}
+library(psych) # using for describe() function
+library(tidyverse) # using for read_csv() function, so character variables still kept as characters
+```
+
+## Read data
+```{r, message=FALSE}
+nested_demo<-read_csv(file="Nested_demo.csv")
+```
+
+
+## Get variable descriptives
+```{r}
+describe(nested_demo) #note: we get NaN because variables are factors (data includes letters)
+```
+
+
+
+
+```{r}
+nested_demo <- mutate(nested_demo, 
+                      Hospital = as.factor(Hospital),
+                      Drug = as.factor(Drug),
+                      Condition = as.factor(Condition))
+```
+
+
+
+## Calculate the mean values of Y by hospital, drug, and condition
+```{r}
+# aggregate function here just shows the values that we're comparing, but we're not saving these values
+aggregate(nested_demo$Y, by=list(Hospital=nested_demo$Hospital), mean)
+aggregate(nested_demo$Y, by=list(Drug=nested_demo$Drug), mean)
+aggregate(nested_demo$Y, by=list(Condition=nested_demo$Condition), mean)
+```
+
+
+
+# Boxplot of Y by Hospital
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Hospital)) +
+  geom_boxplot()
+```
+# Boxplot of Y by Drug
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Drug)) +
+  geom_boxplot() 
+```
+
+# Boxplot of Y by Drug faceted by hospital
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Drug)) +
+  geom_boxplot() +
+  facet_wrap(~Hospital)
+```
+
+
+# Boxplot of Y by Condition
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Condition)) +
+  geom_boxplot() 
+
+```
+
+# Boxplot of Y by Condition (Nested in drug)
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Condition)) +
+  geom_boxplot() + 
+  facet_wrap(~Drug) 
+
+```
+
+
+# Boxplot of condition nested in drug by Hospital
+```{r}
+ggplot(nested_demo, aes(y = Y, color = Condition)) +
+  geom_boxplot() + 
+  facet_wrap(vars(Drug, Hospital)) 
+```
+
+
+## 5) Nested ANOVA in which Y is regressed on Hospital, Drug, Condition, and the
+## 5a) Create ANOVA table that lists all of the factors and the df for each
+
+Factors (i.e., effects we can test with this model)              
+Hospital                
+Drug                    
+Condition within Drug 
+Hospital * Drug
+Hospital * (Condition within Drug)
+Error
+
+
+## 5d) Conduct ANOVA on full nested model Full
+This gives same output as the two models above combined
+```{r}
+mod1 <- lm(Y~ Hospital + Drug + Drug/Condition + Hospital*Drug + Hospital*Drug/Condition, data=nested_demo)
+anova(mod1)
+
+# Syntax: / specifies within, and * specifies the interaction
+# Drug not nested within hospital in this data, because the drugs are the same between the two hospitals (i.e., the effects of a particular drug could be different from one hospital to the next).
+
+# Similarly, condition is not nested within hospital in this data, because the conditions are the same between the two hospitals (i.e., the effects of a particular condition could be different from one hospital to the next).
+
+# However, condition IS nested within drug, because the conditions are different between the two drugs. Since each condition was not tested for each drug, it is not possible to assess the possibility that the different conditions are different between the drugs.
+```
+
+
+# Get effect sizes
+## Hospital
+```{r}
+# Hospital
+.02 / (.02 + .01 + 39.30 + .08 + .75 + 913.47)
+
+```
+## Drug
+```{r}
+.01 / (.02 + .01 + 39.30 + .08 + .75 + 913.47)
+```
+## Drug/Condition
+```{r}
+33.30 / (.02 + .01 + 39.30 + .08 + .75 + 913.47)
+```
+## Hospital*Drug
+```{r}
+.08 / (.02 + .01 + 39.30 + .08 + .75 + 913.47)
+```
+## Hospital * (Drug/Condition)
+```{r}
+.75 / (.02 + .01 + 39.30 + .08 + .75 + 913.47)
+```
+
+
+# Set up contrasts 
+```{r}
+
+contrasts(nested_demo$Hospital) <- c(-1, 1)
+contrasts(nested_demo$Drug) <- c(-1,1)
+
+cc1 <- c(-1, 1, 0, 0, 0, 0)
+cc2 <- c(-1, 0, 1, 0, 0, 0)
+
+cc3 <- c(0, 0, 0, -1, 1, 0)
+cc4 <- c(0, 0, 0, -1, 0, 1)
+
+
+contrasts(nested_demo$Condition) <- cbind(cc1, cc2, cc3, cc4)
+
+str(nested_demo)
+
+
+```
+
+```{r}
+mod_contrast <- lm(Y~ Hospital + Drug + Drug/Condition + Hospital*Drug + Hospital*(Drug/Condition), data=nested_demo)
+summary.lm(mod_contrast)
+```
+
+
+
+# Part 2: Try it Yourself
+
+Factors (i.e., effects we can test with this model)              
+Hospital    (df=1)             
+Drug within hospital (df=2; 1 for each hospital)
+Condition within drug within hospital (df=8; 2 for each drug in each hospital)
+Error (df = 114-11-1 = 102)
+
+No interactions testable here, because the model is fully nested
+
+## Read data
+```{r, message=FALSE}
+nested_practice<-read_csv(file="Nested_practice.csv")
+```
+ 
+## Check how variables are read
+```{r}
+str(nested_practice)
+```
+The three predictor variables (Hospital, Drug, and Condition) are all character variables, and the outcome variable (Y) is numeric.
+
+
+```{r}
+nested_practice <- mutate(nested_practice, 
+                      Hospital = as.factor(Hospital),
+                      Drug = as.factor(Drug),
+                      Condition = as.factor(Condition))
+```
+
+
+
+
+
+## Get variable descriptives
+```{r, row.print=13}
+psych::describe(nested_practice) #note: variables are characters (include text)
+```
+We don't get numeric descriptive statsitics for the three predictor variables because they are character variables.
+
+## Calculate the mean values of Y by hospital, drug, and condition
+```{r, rows.print=12}
+# the aggregate function shows us the mean value of Y across each level of the predictors.
+aggregate(nested_practice$Y, by=list(Hospital=nested_practice$Hospital), mean)
+aggregate(nested_practice$Y, by=list(Drug=nested_practice$Drug), mean)
+aggregate(nested_practice$Y, by=list(Condition=nested_practice$Condition), mean)
+```
+The mean of Y is quite similar between the two hospitals and between the four drugs. The mean of Y varies a little more across the 12 treatment conditions, ranging from 7.70 to 9.89.
+
+# Boxplots
+## Y By Hospital
+```{r}
+ggplot(nested_practice, aes(y = Y, color = Hospital)) +
+  geom_boxplot()
+```
+
+## Y By drug, faceted by Hospital
+```{r}
+ggplot(nested_practice, aes(y = Y, color = Drug)) +
+  geom_boxplot() +
+  facet_wrap(~Hospital)
+```
+
+## Y by condition faceted by hospital and drug
+```{r}
+ggplot(nested_practice, aes(y = Y, color = Condition)) +
+  geom_boxplot() +
+  facet_wrap(vars(Hospital, Drug))
+```
+
+
+## 4
+### 4a) list the factors we can include in the ANOVA and  the df for each
+Factors (i.e., effects we can test with this model):               
+1) Hospital (df=1)             
+2) Drug within hospital (df=2; 1 for each hospital)
+3) Condition within drug within hospital (df=8; 2 for each drug in each hospital)
+4) Error (df = 114-11-1 = 102)
+
+No interactions are testable here because the model is fully nested.
+
+
+
+
+### 4d) Run one-way ANOVA for Condition and plug results into the ANOVA table
+```{r}
+mod6 <- anova(lm(Y ~ Hospital/Drug/Condition, data=nested_practice))
+mod6
+# We need to specify the nesting structure when we include drug and condition in the model. Since condition is nested within drug, which is nested within hospital, the model output also gives us estimates for drug and hospital.
+```
+
+### 4e) Run full nested ANOVA to test effect of Hospital, Drug, and Condition on Y
+```{r}
+mod3 <- anova(lm(Y ~ Hospital + Hospital/Drug + Hospital/Drug/Condition, data=nested_practice))
+mod3
+```
+R gives you the same results as in part 4d.
+
+None of the F statistics for the predictors are statistically significant at p<0.05. These results indicate that, when taking into account the nesting structure of the data, patient health (Y) did not significantly differ between the two hospitals, the four drugs, and the 12 treatment conditions. 

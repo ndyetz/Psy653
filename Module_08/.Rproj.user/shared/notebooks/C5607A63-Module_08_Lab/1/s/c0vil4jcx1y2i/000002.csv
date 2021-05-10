@@ -1,0 +1,12 @@
+"0","longitudinal <- read_csv(""Longitudinal.csv"")"
+"2","
+[36m--[39m [1m[1mColumn specification[1m[22m [36m-------------------------------------------------------------------------------------------------[39m
+cols(
+  student = [32mcol_double()[39m,
+  occas = [32mcol_double()[39m,
+  gpa = [32mcol_double()[39m,
+  job = [32mcol_double()[39m,
+  sex = [32mcol_double()[39m
+)
+
+"

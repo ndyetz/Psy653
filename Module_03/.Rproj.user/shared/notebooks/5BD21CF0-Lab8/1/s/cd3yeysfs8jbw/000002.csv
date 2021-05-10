@@ -1,0 +1,11 @@
+"0","med <- read_csv(""mediate2.csv"")"
+"2","Parsed with column specification:
+cols(
+  X1 = [32mcol_double()[39m,
+  X2 = [32mcol_double()[39m,
+  X3 = [32mcol_double()[39m,
+  X4 = [32mcol_double()[39m,
+  X5 = [32mcol_double()[39m,
+  Y1 = [32mcol_double()[39m
+)
+"

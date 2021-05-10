@@ -1,0 +1,21 @@
+"0","#covid <- read_csv(""covid.csv"", "
+"0","#                  col_types = cols(date = col_date(""%m/%d/%Y"")))"
+"0","#"
+"0","#"
+"0","#covid <- filter(covid, location == ""United States"")"
+"0","#covid <- filter(covid, !is.na(new_cases))"
+"0","#covid <- select(covid, location, date, new_cases)"
+"0","#"
+"0","#write_csv(covid, ""covid2.csv"", na = """")"
+"0",""
+"0",""
+"0","covid <- read_csv(""covid2.csv"")"
+"2","
+[36m--[39m [1m[1mColumn specification[1m[22m [36m-------------------------------------------------------------------------------------------------------------------[39m
+cols(
+  location = [31mcol_character()[39m,
+  date = [34mcol_date(format = """")[39m,
+  new_cases = [32mcol_double()[39m
+)
+
+"

@@ -1,0 +1,148 @@
+---
+title: "Nonlinear with continuous predictor variables"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+# Load libraries
+```{r}
+library(olsrr)
+library(psych)
+library(tidyverse)
+```
+
+
+
+# Import data
+```{r}
+cog <- read_csv("cogtest.csv")
+```
+
+# describe data
+```{r}
+describe(cog)
+```
+
+# Plot the data
+## As a linear relationship
+```{r}
+ggplot(cog, aes(x = practice, y = score)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() +
+  scale_x_continuous(limits=c(0,14), breaks = seq(0, 14, by = 2)) +
+  labs(title = "Does more practice equal better score?", subtitle = "Overlay best fit straight line", 
+       x = "Minutes Spent Practicing", y = "Score")
+
+
+```
+
+
+## Plot data with a quadratic function
+```{r}
+# plot data with quadratic function
+ggplot(cog, aes(x = practice, y = score)) + 
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE) + 
+  geom_point() +
+  scale_x_continuous(limits=c(0,14), breaks = seq(0, 14, by = 2)) +
+  labs(title = "Does more practice equal better score?", subtitle = "Overlay quadratic curve", 
+       x = "Minutes Spent Practicing", y = "Score")
+```
+
+# Mutate variables for polynomial regression: Get quadratic and cubic variables
+```{r}
+cog <- mutate(cog,
+                  practice2 = practice^2,
+                  practice3 = practice^3)
+```
+
+
+
+# Run linear, quadratic and cubic models
+## Linear model
+```{r}
+mod_lin <- lm(score ~ practice, data = cog)
+ols_regress(mod_lin)
+```
+
+
+## Quadratic model
+```{r}
+mod_quad <- lm(score ~ practice + practice2, data = cog)
+ols_regress(mod_quad)
+```
+
+## Cubic model
+```{r}
+mod_cub <- lm(score ~ practice + practice2 + practice3, data = cog)
+ols_regress(mod_cub)
+```
+
+
+# Assignment
+# read in data
+```{r}
+hp <- read_csv("happyplanet.csv")
+```
+
+
+```{r}
+hp <- hp %>% 
+  mutate(gdp = gdp/10000)
+
+write_csv(hp, "happyplanet2.csv", na = "")
+```
+
+
+# Describe data
+```{r}
+describe(hp)
+```
+
+
+# Plot the relationship between wellbe and gdp
+```{r}
+ggplot(hp, aes(x = gdp, y = wellbe)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+
+
+```{r}
+ggplot(hp, aes(x = gdp, y = wellbe)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x,2), se = FALSE)
+```
+
+# Mutate the gdp variable
+```{r}
+hp <- mutate(hp, 
+             gdp2 = gdp^2,
+             gdp3 = gdp^3)
+```
+
+
+
+# Run models
+## Linear
+```{r}
+mod_lin <- lm(wellbe ~ gdp, data = hp)
+ols_regress(mod_lin)
+```
+
+## quadratic
+```{r}
+mod_quad <- lm(wellbe ~ gdp + gdp2, data = hp)
+ols_regress(mod_quad)
+```
+
+## cubic
+```{r}
+mod_cub <- lm(wellbe ~ gdp + gdp2 + gdp3, data = hp)
+ols_regress(mod_cub)
+```
+
+
+

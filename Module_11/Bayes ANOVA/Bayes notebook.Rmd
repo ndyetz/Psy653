@@ -1,0 +1,46 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# install pacakges, read data, summarize
+```{r}
+library(BayesFactor)
+
+retirement<-read.csv(file="retirement.csv")
+attach(retirement)
+summary(retirement)
+```
+
+
+# ANOVA - first create factors
+```{r}
+retirement$gender=factor(retirement$gender)
+levels(retirement$gender)= c("Female", "Male")
+retirement$occupation=factor(retirement$occupation)
+levels(retirement$occupation)=c("Prof","Manag","nonmanual","Skilled","Semi-Skilled","Unskilled")
+
+summary(aov(mental ~ gender*occupation, data=retirement))
+
+```
+# There is an occupation main effect
+
+# Bayesian analysis - all models, top down and bottom up
+
+```{r}
+bfa = anovaBF(mental ~ gender*occupation, data=retirement,whichModels = 'all')
+bfa
+bft = anovaBF(mental ~ gender*occupation, data=retirement,whichModels = 'top')
+bft
+bfb = anovaBF(mental ~ gender*occupation, data=retirement,whichModels = 'bottom')
+bfb
+```
+
+# all models - anything that occupation main effect has large bf
+
+# top down - omit occupation and the model has very little power
+
+# bottom up - add occupation and the BF goes way up

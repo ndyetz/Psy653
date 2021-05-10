@@ -1,0 +1,169 @@
+---
+title: "PSY 653 Module 2: Interaction Effects (aka Moderation)"
+subtitle: "Feb 5, 2020"
+output:
+  html_document:
+    df_print: paged
+---
+# Part 1: In-class Demo
+Use the "moderation_demo.csv" datafile
+
+## Load libraries
+```{r}
+library(psych)
+library(tidyverse)
+library(olsrr)
+```
+
+## Read in data
+```{r}
+dat <- read_csv("moderation_demo.csv")
+```
+
+## Get descriptives
+```{r}
+describe(dat)
+```
+
+## Examine correlation between att1 & att3
+```{r}
+cor(dat$att1, dat$att3)
+```
+Since the correlation between att1 and att3 is small, there is room for a moderation effect.
+
+
+```{r}
+ggplot(dat, aes(x = att1, y = att3)) +
+  geom_jitter() +
+  geom_smooth(method = "lm") +
+  theme_classic()
+```
+
+
+
+## Create the cross product of att1 & att3
+```{r}
+dat <- mutate(dat, att1att3 = att1*att3)
+```
+
+## Run moderated regression in which att1, att3, and att1*att3 predict out4
+### Main Effects model
+```{r}
+modME <- lm(out4  ~ att1 + att3, data = dat)
+ols_regress(modME)
+```
+
+### Interaction model
+```{r}
+modINT <- lm(out4 ~ att1 + att3 + att1*att3 , data = dat)
+ols_regress(modINT)
+```
+
+
+```{r}
+library(sjPlot)
+library(sjmisc)
+
+plot_model(modINT, type = "pred", terms = c("att3", "att1"), show.intercept = TRUE)
+
+```
+
+
+
+
+# Compare the two models
+```{r}
+anova(modME,modINT)
+```
+The model that includes the interaction effect accounts (modINT) for a significantly larger amount of variance in out4 compared to the model that only includes the main effects (modME) of the two predictors.
+
+# Part 2: Try it yourself
+Use the "moderation_sleepdata.csv" datafile
+In this exmaple, you will examine how sleep hygiene, anxiety, and the interaction between sleep hygiene and anxiety influence how well participants slept.
+
+## Read in data
+```{r}
+sleep_data <- read_csv("moderation_sleepdata.csv")
+```
+
+## Get descriptives
+```{r}
+describe(sleep_data)
+```
+
+## Examine correlation between anxiety and hygiene
+```{r}
+cor(sleep_data$anxiety, sleep_data$hygiene)
+```
+Since the correlation between the two variables is relatively small, there is room for a moderation effect
+
+## Create the cross-product of hygiene and anxiety
+```{r}
+sleep_data <- mutate(sleep_data, anxiety_hygiene = hygiene*anxiety)
+```
+
+## Run moderated regression in which hygiene, anxiety, and hygiene*anxiety predict sleep
+### Main effects model
+```{r}
+slp_mod1 <- lm(sleep  ~ hygiene + anxiety, data = sleep_data )
+ols_regress(slp_mod1)
+```
+
+### Interaction model
+```{r}
+slp_mod2 <- lm(sleep  ~ hygiene + anxiety + anxiety_hygiene, data = sleep_data )
+ols_regress(slp_mod2)
+```
+
+## Compare the two models
+```{r}
+anova(slp_mod1,slp_mod2)
+```
+At a significance threshold of p<0.05, the model that included the interaction effect (slp_mod2) explained a significantly larger amount of variance in sleep than the model that only tested the main effects of anxiety and sleep hygiene (slp_mod1).
+
+
+
+
+
+# Memory data
+
+```{r}
+mem <- read_csv("memory.csv")
+```
+
+
+
+```{r}
+ggplot(mem, aes(x = Dosage, y = Mem_Score)) +
+  geom_jitter() + 
+  geom_smooth(method = "loess")
+```
+
+
+
+```{r}
+
+mem <- mutate(mem, 
+                    
+                    linear = ifelse(Dosage == 1,  -1, Dosage), 
+                    linear = ifelse(Dosage == 2,   0, linear), 
+                    linear = ifelse(Dosage == 3,   1, linear), 
+                    
+                    quadratic = ifelse(Dosage == 1,   1, Dosage),
+                    quadratic = ifelse(Dosage == 2,  -2, quadratic),
+                    quadratic = ifelse(Dosage == 3,   1, quadratic)
+                    )
+
+
+```
+
+
+```{r}
+m1 <- lm(Mem_Score ~ linear, data = mem)
+ols_regress(m1)
+```
+
+```{r}
+m2 <- lm(Mem_Score ~ linear + quadratic, data = mem)
+ols_regress(m2)
+```

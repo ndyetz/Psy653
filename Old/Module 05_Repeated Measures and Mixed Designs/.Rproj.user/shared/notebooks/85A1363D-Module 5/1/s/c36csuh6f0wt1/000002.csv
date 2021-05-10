@@ -1,0 +1,9 @@
+"0","syl <- read_csv(""syllables.csv"")"
+"2","Parsed with column specification:
+cols(
+  ID = [32mcol_double()[39m,
+  length = [32mcol_double()[39m,
+  cond = [32mcol_double()[39m,
+  time = [32mcol_double()[39m
+)
+"

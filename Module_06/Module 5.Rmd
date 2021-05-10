@@ -1,0 +1,165 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load libraries
+```{r}
+#install.packages("ez")
+
+library(tidyverse)
+library(ez)
+library(psych)
+```
+
+
+# Class example
+## Read in data
+```{r}
+syl <- read_csv("syllables.csv")
+```
+
+## Factor variables
+```{r}
+syl <- mutate(syl, 
+               ID.f     = factor(ID),
+               cond.f   = factor(cond),
+               length.f = factor(length)
+               )
+```
+
+
+## Repeated measures ANOVA
+```{r}
+ezANOVA(
+        data=syl,
+        dv=time,
+        wid=ID.f, 
+        within= length.f,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+### Visualize the effect
+```{r}
+syl_sum <- group_by(syl, length.f) 
+syl_sum <- summarise(syl_sum, time = mean(time)) 
+syl_sum <- ungroup(syl_sum)
+
+ggplot(syl_sum, aes(x = length.f, y = time, group = length.f, fill = length.f)) + 
+  geom_col(width = .5) +
+  theme_bw() +
+  labs(title = "Does length of time to read each word significantly differ by word syllable length?", fill = "word length",
+       x = "Word length")
+
+```
+
+
+
+## Mixed design
+```{r}
+ezANOVA(
+        data=syl,
+        dv=time,
+        wid=ID.f, 
+        within= length.f,
+        between = cond.f,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+
+### Visualize the effect
+```{r}
+
+
+syl_sum <- group_by(syl, cond.f, length.f) 
+syl_sum <- summarise(syl_sum, time = mean(time)) 
+syl_sum <- ungroup(syl_sum)
+
+ggplot(syl_sum, aes(x = length.f, y = time, color = cond.f)) + 
+  geom_line(aes(group = cond.f)) +
+ # facet_wrap(~cond) +
+  theme_bw() +
+  labs(title = "Does length to say syllable vary by condition?", color = "Condition", 
+       x = "length")
+
+```
+
+
+
+# Assignment
+
+## Load data
+```{r}
+ex <- read_csv("RMexample.csv")
+```
+
+
+## Describe data
+```{r, warning = FALSE}
+describe(ex)
+```
+
+
+## Factor variables
+```{r}
+
+ex <- mutate(ex, 
+             Subject = factor(Subject),
+             Passage = factor(Passage),
+             Author = factor(Author)
+             )
+```
+
+
+
+## Run ANOVA
+
+### Within subject effect
+```{r}
+ezANOVA(
+        data=ex,
+        dv=Y,
+        wid=Subject, 
+        within= Passage,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+#### Eta Squareds 
+```{r}
+
+```
+
+
+
+### Mixed ANOVA
+```{r, warning = FALSE}
+ezANOVA(
+        data=ex,
+        dv=Y,
+        wid=Subject, 
+        within= Passage,
+        between = Author,
+        detailed=TRUE,
+        type = 3
+        )
+
+
+```
+
+```{r}
+ex_sum <- group_by(ex, Author, Passage) 
+ex_sum <- summarise(ex_sum, Y = mean(Y)) 
+ex_sum <- ungroup(ex_sum)
+
+ggplot(ex_sum, aes(x = Passage, y = Y, group = Passage, fill = Passage)) + 
+  geom_col(width = .5) +
+  facet_wrap(~ Author) +
+  theme_bw() 
+```
+

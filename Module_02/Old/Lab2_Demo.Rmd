@@ -1,0 +1,72 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# Load libraries
+```{r}
+library(psych)
+library(tidyverse)
+library(olsrr)
+```
+
+# Read in data
+```{r}
+dat <- read_csv("forlab2.csv")
+```
+
+# View your data
+```{r}
+describe(dat)
+```
+
+# Correlate correlate att1 & att3 
+```{r}
+cor(dat$att1, dat$att3)
+```
+
+
+
+# create the cross product
+```{r}
+dat <- mutate(dat, att1att3 = att1*att3)
+```
+
+
+## Run moderated regression & interpret the results
+
+### Main Effects model
+```{r}
+modME <- lm(out4  ~ att1 + att3, data = dat )
+ols_regress(modME)
+
+```
+
+
+## Interaction model
+```{r}
+modINT <- lm(out4 ~ att1 + att3 + att1att3 , data = dat )
+ols_regress(modINT)
+```
+
+
+# Run the ANOVA
+```{r}
+anova(modME, 
+      modINT)
+```
+
+
+
+
+# 
+
+
+
+
+
+
+
+
+
+
+

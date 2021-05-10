@@ -1,0 +1,6 @@
+"0","dby <- ((mean(males$Y) - mean(females$Y)) * sqrt((nrow(males) / nrow(nc))*(nrow(females) / nrow(nc)))) / sd(nc$Y)"
+"0","dby"
+"1","[1]"
+"1"," 0.02761927"
+"1","
+"

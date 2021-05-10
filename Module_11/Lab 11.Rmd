@@ -1,0 +1,204 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Kevin's R code
+```{r}
+dfhyp= NA				
+dferr= NA
+alpha=.05
+effect=	NA				#enter the minimum effect you are testing
+sse=100	        #Don't change this				
+mse=(((1/effect)-1)*sse)/dferr
+noncen=sse/mse
+qf((1-alpha),dfhyp,dferr,noncen)
+```
+
+
+# 1a Applied to Bret et al. (Right Wing Authoritarianism)
+```{r}
+dfhyp=1					
+dferr=161
+alpha=.05
+effect=.01					#enter the minimum effect you are testing
+sse=100					
+mse=(((1/effect)-1)*sse)/dferr
+noncen=sse/mse
+qf((1-alpha),dfhyp,dferr,noncen)
+
+```
+
+The authors need an F-value of 8.683388 to reach a significant effect at a minimum effect size of .01.
+
+# 1b
+With their F-value of 4.81. They had enough power to reject the comparison of the nil (F-value = 3.89)
+With their F-value of 4.81. They did not have enough power to reject the comparison of 1% or less of the variance (F = 8.61)
+
+# 1c
+They would need a sample size of at least 122 (dferror = n - k) to have a power of .80.
+They would need a sample size of at least 302 to reject the 1% or less of the variance and have a power of .80. 
+
+
+
+# Load libraries
+```{r}
+library(tidyverse)
+library(psych)
+library(car)
+library(BayesFactor)
+```
+
+# read in retirement.csv
+```{r}
+retirement <- read_csv("retirement.csv")
+```
+
+# Factor the categorical variables
+```{r}
+retirement <- mutate(retirement,
+                     sex.f = factor(sex, 
+                                       levels = c(1,2), 
+                                       labels = c("Female", "Male")),
+                     occupation.f = factor(occupation, 
+                                           levels = c(1,2,3,4,5,6), 
+                                        labels = c("Prof", "Manag", "nonmanual", "Skilled", "Semi-Skilled", "Unskilled")))
+```
+
+
+
+
+# describe data
+```{r}
+describe(retirement)
+```
+
+
+# Normal ANOVA
+```{r}
+anova(lm(mental~ sex.f*occupation.f, data = retirement))
+```
+```{r}
+sex_eta    <-  0.21 / (1529.99 + .21 + 45.93 + 6.01)
+occ_eta    <- 45.93 / (1529.99 + .21 + 45.93 + 6.01)
+int_et     <-  6.01 / (1529.99 + .21 + 45.93 + 6.01)
+
+sex_eta
+occ_eta   
+int_et    
+```
+
+
+
+# Bayes ANOVA: "all"
+```{r}
+
+m1 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "all")
+m1
+```
+```{r}
+plot(m1)
+```
+
+
+#Bayes ANOVA: "top"
+```{r}
+m2 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "top")
+m2
+```
+
+
+```{r}
+plot(m2)
+```
+
+
+#Bayes ANOVA: "bottom"
+```{r}
+m3 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "bottom")
+m3
+```
+
+```{r}
+plot(m3)
+```
+
+
+
+
+# Try it yourself
+
+
+## 1a Applied to Bret et al. (Right Wing Authoritarianism)
+```{r}
+dfhyp=1					
+dferr=230
+alpha=.05
+effect=.01					#enter the minimum effect you are testing
+sse=100					
+mse=(((1/effect)-1)*sse)/dferr
+noncen=sse/mse
+qf((1-alpha),dfhyp,dferr,noncen)
+
+```
+
+## 1b
+compared to nill = 3.88
+compared to 1% = 9.58
+
+
+## 1c
+At Nil the needed sample size is 71 (dferror = n - 1)
+At 1% The needed samples size is 121 (dferror = n - 1)
+
+
+## Part 2
+```{r}
+
+slp <- read_csv("slpdata.csv")
+
+```
+
+```{r}
+slp <- mutate(slp, 
+             sex.f = factor(sex, levels = c(1,2), labels = c("male", "female")),
+             cond.f = factor(cond,  levels = c(1,2,3), labels= c("selfhelp", "group", "group_and_partner"))
+             ) 
+```
+
+
+
+```{r}
+anov <- lm(sleep ~ sex.f*cond.f, data=slp)
+anova(anov)
+
+```
+
+
+```{r}
+Bayesm1 <- anovaBF(sleep ~ sex.f*cond.f, data=slp,whichModels = 'all')
+Bayesm1
+plot(Bayesm1)
+
+```
+
+
+```{r}
+Bayesm2 <- anovaBF(sleep ~ sex.f*cond.f, data=slp, whichModels = "top")
+Bayesm2
+plot(Bayesm2)
+```
+
+
+
+```{r}
+Bayesm3 <- anovaBF(sleep ~ sex.f*cond.f, data=slp,whichModels = "bottom")
+Bayesm3
+plot(Bayesm3)
+
+```
+
+
+
+
+

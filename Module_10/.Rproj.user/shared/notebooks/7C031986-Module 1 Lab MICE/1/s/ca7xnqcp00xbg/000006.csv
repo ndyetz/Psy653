@@ -1,0 +1,2 @@
+"0","fit.mi2 <- with(imputed_data, exp= lm(X1 ~ X2 + X3 + X4))"
+"0","summary(fit.mi2)"

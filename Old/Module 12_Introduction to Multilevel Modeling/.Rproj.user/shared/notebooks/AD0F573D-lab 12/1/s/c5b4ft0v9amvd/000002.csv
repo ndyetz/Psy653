@@ -1,0 +1,45 @@
+"0","library(sjstats)"
+"0","icc(randint)"
+"2","'icc' is deprecated.
+Use 'performance::icc()' instead.
+See help(""Deprecated"")"
+"1","[34m# Intraclass Correlation Coefficient
+
+[39m"
+"1","     Adjusted ICC: 0.530
+  Conditional ICC: 0.530"
+"1","
+"
+"0","icc(rifs)"
+"2","'icc' is deprecated.
+Use 'performance::icc()' instead.
+See help(""Deprecated"")"
+"1","[34m# Intraclass Correlation Coefficient
+
+[39m"
+"1","     Adjusted ICC: 0.590
+  Conditional ICC: 0.548"
+"1","
+"
+"0","icc(rsfi)"
+"2","'icc' is deprecated.
+Use 'performance::icc()' instead.
+See help(""Deprecated"")"
+"1","[34m# Intraclass Correlation Coefficient
+
+[39m"
+"1","     Adjusted ICC: 0.481
+  Conditional ICC: 0.446"
+"1","
+"
+"0","icc(allrand)"
+"2","'icc' is deprecated.
+Use 'performance::icc()' instead.
+See help(""Deprecated"")"
+"1","[34m# Intraclass Correlation Coefficient
+
+[39m"
+"1","     Adjusted ICC: 0.011
+  Conditional ICC: 0.011"
+"1","
+"

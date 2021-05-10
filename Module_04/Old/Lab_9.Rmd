@@ -1,0 +1,163 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load Libraries
+```{r}
+library(tidyverse)
+library(olsrr)
+library(psych) 
+```
+
+
+
+# Read in dataset
+```{r}
+slp <- read_csv("slpdata.csv")
+```
+
+# Describe variables
+```{r}
+describe(slp)
+
+```
+
+categorical vars = cond, prior, & sex
+
+# Question 1: How do the levels of treatment condition and sex, and the interaction betweene the two, predict sleep efficiency?
+
+## Create dummy codes for categorical predictors
+```{r}
+
+#sex & Condition
+slp <- mutate(slp, 
+              sex = ifelse(sex == 1, 0, 1),
+              sex.f = factor(sex, levels = c(0,1), labels = c("male", "female")))
+
+slp <- mutate(slp,
+              cond2 = ifelse(cond == 2, 1, 0),
+              cond3 = ifelse(cond == 3, 1, 0),
+              cond.f = factor(cond, levels = c(1,2,3), labels = c("self help", "group-based", "group + partner"))) 
+
+
+```
+
+
+## Run model
+```{r}
+
+
+m1 <- lm(hygiene ~ sex.f + cond2 + cond3 + sex.f*cond2 + sex.f*cond3, data = slp)
+ols_regress(m1)
+
+```
+
+
+Interpretation of parameter estimates:
+
+Intercept: The predicted sleep hygiene score when all x variables are zero, so males in Condition 1.
+
+female: This variable is involved in an interaction, so it's a simple slope. Specifically, it is the effect of female when both cond2 = 0 and cond3 = 0, so people in Condition 1. Therefore, it is the predicted difference in sleep hygiene between females and males in Condition 1. The slope is positive, meaning that females in Condition 1 tend to have better sleep hygiene than males in Condition 1. This is a sta-tistically significant difference (p-value is less than alpha).
+
+cond2: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 2 (compared to Condition 1) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 2 compared to males in Condition 1. This is a statistically significant difference (p-value is less than alpha).
+
+cond3: This variable is involved in an interaction, so it is a simple slope. It is the effect of being in Condition 3 (compared to Condition 1) when female = 0, so among males. It is the predicted difference in sleep hygiene for males in Condition 3 compared to males in Condition 1. This is a statistically significant difference (p-value is less than alpha).
+
+female:cond2: The predicted differential effect of being in Condition 2 compared to Condition 1 for females compared to males. This is a statistically significant difference (p-value is less than alpha). The coefficient for cond2 presents the effect (i.e., benefit) of being in Condition 2 (compared to 1) for males. To get the effect for females, we take the effect for males (2.084) and add the female:cond2 interaction term (-.643). Therefore, the effect (i.e., benefit) of being in Condition 2 (compared to Condition 1) for females is 1.441.
+
+female:cond3: The predicted differential effect of being in Condition 3 compared to Condition 1 for females compared to males. This is a statistically significant difference (p-value is less than alpha). The coefficient for cond3 presents the effect (i.e., benefit) of being in Condition 3 (compared to 1) for males. To get the effect for females, we take the effect for males (2.962) and add the female:cond3 interaction term (-1.160). Therefore, the effect (i.e., benefit) of being in Condition 3 (compared to Condition 1) for females is 1.802.
+
+
+## Effect coding variables
+```{r}
+slp <- mutate(slp,
+              
+              cond2 = ifelse(cond == 2, 1, 0),
+              cond3 = ifelse(cond == 3, 1, 0),
+              
+              cond2 = ifelse(cond == 1, (-1), cond2),
+              cond3 = ifelse(cond == 1, (-1), cond3),
+              
+              cond.f = factor(cond, levels = c(1,2,3), labels = c("self help", "group-based", "group + partner"))) 
+```
+
+
+```{r}
+m2 <- lm(hygiene ~ sex.f + cond2 + cond3 + sex.f*cond2 + sex.f*cond3, data = slp)
+ols_regress(m2)
+```
+
+
+
+## Polynomial contrasts
+### Plot relationship
+```{r}
+cog <- read_csv("cogtest.csv")
+```
+
+
+```{r}
+cog <- filter(cog, practice == 0 | practice == 4 | practice == 8 | practice == 12)
+```
+
+```{r}
+describe(cog)
+```
+
+
+```{r}
+ggplot(cog, aes(x = practice, y = score)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+```
+
+
+## Orthoganol polynomials
+```{r}
+
+cog <- mutate(cog,
+              
+              linear = ifelse(practice == 0, -3, practice ),
+              linear = ifelse(practice == 4, -1, linear   ),
+              linear = ifelse(practice == 8,  1, linear   ),
+              linear = ifelse(practice == 12, 3, linear   ),
+              
+              quadratic = ifelse(practice == 0,  1, practice ),
+              quadratic = ifelse(practice == 4, -1, quadratic),
+              quadratic = ifelse(practice == 8, -1, quadratic),
+              quadratic = ifelse(practice == 12, 1, quadratic),
+              
+              cubic = ifelse(practice == 0, -1, practice),
+              cubic = ifelse(practice == 4,  3, cubic   ),
+              cubic = ifelse(practice == 8, -3, cubic   ),
+              cubic = ifelse(practice == 12, 1, cubic   )
+              )
+
+```
+
+
+```{r}
+m3 <- lm(score ~ linear, data = cog)
+ols_regress(m3)
+```
+```{r}
+m4 <- lm(score ~ linear + quadratic, data = cog)
+ols_regress(m4)
+```
+
+These are the results of the quadratic model. The quadratic term (practice2) is statistically significant, indicating that there is a substantial curve to the relationship. We need to maintain this term in the model.
+
+
+
+```{r}
+m5 <- lm(score ~ linear + quadratic + cubic, data = cog)
+ols_regress(m5)
+```
+These are the results of the cu-bic model. The cubic term (practice3) is not significant there is not a second bend to the relationship. Therefore, the quadratic model is the best one for these data. Therefore, we will move forward with the quadratic model.
+
+
+
+
+
+

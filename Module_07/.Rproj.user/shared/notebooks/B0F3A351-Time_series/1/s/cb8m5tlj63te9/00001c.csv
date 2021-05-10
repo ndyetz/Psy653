@@ -1,0 +1,6 @@
+"0",""
+"0","daily_data <- mutate(daily_data, Date = as.Date(dteday))"
+"0",""
+"0","ggplot(daily_data, aes(x = Date, y = cnt)) + "
+"0","  geom_line() + "
+"0","  ylab(""Daily Bike Checkouts"") "

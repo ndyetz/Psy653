@@ -1,0 +1,200 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load Libraries
+```{r,message=FALSE}
+library(tidyverse)
+library(olsrr)
+library(psych) 
+```
+
+# Read in dataset
+```{r,message=FALSE}
+slp <- read_csv("slpdata.csv")
+```
+
+# Reduce dataset to just variables of interest
+```{r}
+slp <- select(slp, cond, hygiene)
+```
+
+
+
+# Describe variables
+```{r}
+describe(slp)
+```
+categorical vars = cond, prior, & sex
+
+
+# Part 1: Using dummy coding, use treatment condition, sex, and their interaction to predict sleep hygiene.
+
+## Specify dummy codes for categorical predictors
+```{r}
+
+slp <- mutate(slp,
+              cond2 = ifelse(cond == 2, 1, 0),
+              cond3 = ifelse(cond == 3, 1, 0)) 
+```
+
+## Run model
+```{r}
+m1 <- lm(hygiene ~ cond2 + cond3, data = slp)
+ols_regress(m1)
+```
+Interpretation of dummy coded model:
+
+Intercept: The predicted sleep hygiene score when all x variables are zero, so participants in Condition 1.
+
+cond2: the predicted difference in sleep hygiene score between particiants in condition 2 compared to condition 1.
+
+cond3: the predicted difference in sleep hygiene score between particiants in condition 3 compared to condition 1.
+
+
+
+# Part 2: Redo this analysis using effect coding for treatment condition
+
+## Specificy effect coding for categotical variables
+"With this coding structure the same process is completed as
+that for dummy coding except the last group receives a −1 on all contrasts, thus
+only k −1 contrasts are used in this coding type (Wendorf, 2004)." (from Davis, 2010)
+```{r}
+slp <- mutate(slp,
+              
+              cond2.ec = ifelse(cond == 2, 1, 0),
+              cond3.ec = ifelse(cond == 3, 1, 0),
+              
+              cond2.ec = ifelse(cond == 1, (-1), cond2.ec),
+              cond3.ec = ifelse(cond == 1, (-1), cond3.ec)) 
+```
+
+## Run model without interaction first
+```{r}
+m2 <- lm(hygiene ~ cond2.ec + cond3.ec, data = slp)
+ols_regress(m2)
+```
+Interpretation of effect coding model:
+
+Effects coding allows us to examine mean differences between two groups. In effects coding, the slope estimates are simply the difference between the mean of the group coded as 1 and the grand mean of all the groups.
+
+Intercept: In effect coding, the intercept is the grand mean of sleep hygiene across all the three treatment groups
+
+cond2: the predicted difference in sleep hygiene score between particiants in condition 2 compared to the mean of all three treatment conditions.
+
+cond3: the predicted difference in sleep hygiene score between particiants in condition 3 compared to the mean of all three treatment conditions.
+
+
+# Contrast Coding
+```{r}
+
+slp <- mutate(slp,
+              contrast_1v2 = ifelse( cond == 1,  .5, ifelse(cond == 2, -.5,   0)),   # Compare condition 1 and condition 2
+              contrast_3v12 = ifelse(cond == 1, -.5, ifelse(cond == 2, -.5,   1)))   # Compare condition 3 to condition 1 & 2
+```
+
+# Contrast Coded Model
+```{r}
+m3 <- lm(hygiene ~ contrast_1v2 + contrast_3v12, data = slp)
+ols_regress(m3)
+```
+
+
+```{r}
+aggregate(slp$hygiene, by = list(cond = slp$cond), mean)
+
+ 6.28730-1.627
+ 5.994+1.041
+ 
+ 
+```
+
+
+
+
+
+
+
+
+
+
+
+# Try it yoursefl activity
+## Load libraries
+```{r}
+library(psych)
+library(olsrr)
+library(tidyverse)
+```
+
+
+## Read in data
+```{r}
+
+diet <- read_csv("Diet.csv")
+
+```
+
+# Reduce dataset
+```{r}
+diet_reduced <- select(diet, gender, Diet, weightLOST)
+```
+
+
+```{r}
+describe(diet_reduced)
+
+```
+
+```{r}
+diet_reduced %>% 
+  group_by(Diet) %>% 
+  summarize(mean_weightLOST = mean(weightLOST, na.rm = TRUE))
+```
+
+
+## Dummy code diet variable
+```{r}
+diet_reduced <- mutate(diet_reduced, 
+                       Diet2.dum = ifelse(Diet == 2, 1, 0),
+                       Diet3.dum = ifelse(Diet == 3, 1, 0)
+                       )
+```
+
+
+
+## Run regression model with dummy coded variables
+```{r}
+mod1 <- lm(weightLOST ~ Diet2.dum + Diet3.dum, data = diet_reduced)
+ols_regress(mod1)
+```
+```{r}
+mod2 <- lm(weightLOST ~ gender + Diet2.dum + Diet3.dum + gender*Diet2.dum + gender*Diet3.dum, data = diet_reduced)
+ols_regress(mod2)
+```
+
+## Effect coding 
+```{r}
+
+diet_reduced <- mutate(diet_reduced,
+                       
+                       Diet2.ec = ifelse(Diet == 2, 1, 0),
+                       Diet3.ec = ifelse(Diet == 3, 1, 0),
+                       
+                       Diet2.ec = ifelse(Diet == 1, -1, Diet2.ec),
+                       Diet3.ec = ifelse(Diet == 1, -1, Diet3.ec))
+
+
+```
+
+
+## Run regression model with effect coded variables
+```{r}
+mod3 <- lm(weightLOST ~ Diet2.ec + Diet3.ec, data = diet_reduced)
+ols_regress(mod3)
+```
+```{r}
+mod3 <- lm(weightLOST ~ Diet2.ec + Diet3.ec + gender*Diet2.ec + gender*Diet3.ec, data = diet_reduced)
+ols_regress(mod3)
+```

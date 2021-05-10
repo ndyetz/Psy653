@@ -1,0 +1,133 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load Libraries
+```{r}
+library(psych)
+library(tidyverse)
+library(olsrr)
+
+```
+
+
+# Read in data
+```{r}
+dat <- read_csv("forlab2.csv")
+```
+
+# Remove 9's
+```{r}
+#dat <- dat %>% 
+#  na_if(9) %>% 
+#  drop_na()
+```
+
+
+# Create Cross Product
+```{r}
+datx <- mutate(dat, att1att3 = att1*att3)
+datx <- select(datx, att1, att3, att1att3, out4)
+```
+
+
+```{r}
+describe(dat)
+```
+
+```{r}
+table(dat$att1)
+table(dat$att2)
+table(dat$att3)
+table(dat$att4)
+table(dat$att5)
+
+table(dat$out1)
+table(dat$out2)
+table(dat$out3)
+table(dat$out4)
+```
+
+
+
+
+
+```{r}
+mutate_all(datx, factor)
+
+#(datx$att1)
+```
+
+
+
+# Describe data
+```{r}
+describe(datx)
+```
+
+
+```{r}
+table(datx$att1)
+table(datx$att3)
+table(datx$out4)
+```
+
+
+
+
+# Run the appropriate tests
+## Start by looking at the correlations
+```{r}
+
+cor(datx$att1, datx$att3)
+
+```
+
+## Run moderated regression & interpret the results
+NOTE: I'm confused are att1 & att3 continuous or categorical? 
+### Main Effects model
+```{r}
+modME <- lm(out4  ~ att1 + att3, data = datx )
+ols_regress(modME)
+
+```
+
+## Interaction model
+```{r}
+modINT <- lm(out4 ~ att1 + att3 + att1*att3 , data = datx )
+ols_regress(modINT)
+```
+
+### Compare the two
+```{r}
+anova(modME, 
+      modINT)
+```
+
+
+
+
+
+
+```{r}
+
+#library(CGPfunctions)
+#Plot2WayANOVA(formula=out4 ~ att1 * att3, 	dataframe=datx)
+
+```
+
+```{r}
+modtest <- lm(out4 ~ att1 * att3, data = datx)
+```
+
+
+```{r}
+#install.packages("phia")
+library(phia)
+
+phia::testInteractions(modtest, fixed = "att3" , across= "att1", adjustment= "none") 
+
+
+```
+

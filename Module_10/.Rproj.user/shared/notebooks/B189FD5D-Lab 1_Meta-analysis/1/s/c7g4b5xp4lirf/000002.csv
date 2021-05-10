@@ -1,0 +1,8 @@
+"0","studies <- read_csv(file=""studies.csv"")"
+"2","Parsed with column specification:
+cols(
+  r = [32mcol_double()[39m,
+  n = [32mcol_double()[39m,
+  Study = [31mcol_character()[39m
+)
+"

@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# Load libraries
+```{r}
+library(BayesFactor)
+library(car)
+library(tidyverse)
+```
+
+# read in retirement.csv
+```{r}
+retirement <- read_csv("retirement.csv")
+```
+
+# Factor the categorical variables
+```{r}
+retirement <- mutate(retirement,
+                     sex.f = factor(sex, 
+                                       levels = c(1,2), 
+                                       labels = c("Female", "Male")),
+                     occupation.f = factor(occupation, 
+                                           levels = c(1,2,3,4,5,6), 
+                                           labels = c("Prof", "Manag", "nonmanual", "Skilled", "Semi-Skilled", "Unskilled")))
+```
+
+# Frequentist  ANOVA
+```{r}
+mod1 <- lm(mental~ sex.f*occupation.f, data = retirement)
+Anova(mod1, type = 3)
+```
+
+```{r}
+sex_eta    <-  0.2 / (.2 + 45.9 + 1536)
+occ_eta    <- 45.9 / (.2 + 45.9 + 1536)
+
+sex_eta
+occ_eta   
+```
+
+
+
+# Bayes ANOVA: "all"
+```{r}
+
+m1 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "all", progress = FALSE)
+m1
+
+
+```
+
+
+```{r}
+plot(m1)
+```
+
+
+
+
+
+#Bayes ANOVA: "top"
+```{r}
+
+m2 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "top", progress = FALSE)
+m2
+
+```
+
+```{r}
+plot(m2)
+```
+
+
+
+#Bayes ANOVA: "bottom"
+```{r}
+m3 <- anovaBF(mental~ sex.f*occupation.f, data = retirement, whichModels = "bottom", progress = FALSE)
+m3
+
+```
+
+```{r}
+plot(m3)
+```
+
+
+
+
+
+

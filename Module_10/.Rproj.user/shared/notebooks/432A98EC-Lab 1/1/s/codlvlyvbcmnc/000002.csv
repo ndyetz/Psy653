@@ -1,0 +1,1 @@
+"0","fit.mi <- with(imputed_data, exp= lm(X1 ~ X2))"

@@ -1,0 +1,5 @@
+"0",""
+"0",""
+"0","females <- filter(nc, sex == ""F"")"
+"0","males   <- filter(nc, sex == ""M"")"
+"0",""

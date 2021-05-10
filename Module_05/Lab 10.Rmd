@@ -1,0 +1,240 @@
+---
+title: "Module 10 notebook"
+output: html_notebook
+---
+
+# Clear environment
+```{r}
+rm(list = ls())
+```
+
+
+# Demo activity
+
+## Load Libraries
+```{r}
+library(tidyverse)
+library(psych)
+```
+
+
+## Read in data
+```{r}
+lr <- read_csv("Logistic2.csv")
+```
+
+# Describe data
+```{r}
+describe(lr)
+```
+
+
+# Logistic regression
+## Start simple, include one binary variable
+```{r}
+log_mod1 <- glm(Y ~ X1, family = binomial, data = lr)
+summary(log_mod1)
+```
+### Get OR and 95% confidence intervals
+```{r}
+exp(coefficients(log_mod1))
+exp(confint(log_mod1))
+```
+
+## Make it a little harder, add one binary and one continuous variable
+```{r}
+log_mod2 <- glm(Y ~ X1 + X2, family = binomial, data = lr)
+summary(log_mod2)
+```
+### Get OR and 95% confidence intervals
+```{r}
+exp(coefficients(log_mod2))
+exp(confint(log_mod2))
+```
+
+
+# More complex model, 1 binary and 3 continuous variables
+```{r}
+log_mod <- glm(Y ~ X1 + X2 + X3 + X4, family = binomial, data = lr)
+summary(log_mod) 
+
+```
+
+The model above displays the log odds of each predictor variable (While controlling for all other predictors in the model) on the outcome of Y. We can see that X1 and X4 are statistically significant. However, to have a better interpretation of each with odds ratios, we need to exponentiate the coefficients. 
+
+
+
+## Get ORs & 95% confidence intervals
+```{r}
+exp(coefficients(log_mod))
+exp(confint(log_mod))
+```
+
+
+Intercept: When all of the X variables are zero, the odds are .421 of developing the outcome of Y (Or we can take the inverse and state the they are 2.38 times as likely NOT to develop the outcome of Y). This is not statistically significant.
+X1 (Binary Variable): After controlling for all variables in the model, Those coded as 1 are 5.88 times as likely to develop the outcome of Y as compared to those coded 0. This is statistically significant.
+X2 (Continuous): After controlling for all variables in the model, For every one unit increase in X2, there is an expected increase of 0.918 times of developing Y (Or we can take the inverse and state that for every one unit increase in X2, there is a 1.09 increase in the odds of NOT developing the outcome of Y). This is not statistically significant. 
+X3: (Continuous): After controlling for all variables in the model, For every one unit increase in X3, there is an expected increase of 0.856 times in the odds of developing Y (Or we can take the inverse and state that for every one unit increase in X2, there is a 1.17 increase in the odds of NOT developing the outcome of Y). This is not statistically significant. 
+X4: (Continuous): After controlling for all variables in the model, For every one unit increase in X4, there is an expected increase of 1.81 times in the odds of developing Y. This is statistically significant. 
+
+
+
+## Deviancy test
+```{r}
+anova(log_mod,test="Chisq")
+```
+
+The difference between the deviance for each model and the null is one measure of model fit. These comparisons tell us whether adding information to a null model will lead to better prediction. Each row in the deviance table compares that model to the null model.
+
+X1 = model with just X1
+X2 = model wth X1 + X2
+X3 = model with X1 + X2 + X3
+X4 = model with X1 + X2 + X3 + X4
+
+In this case, Only adding in X4 adds to the predictive power. 
+
+
+## Calculate Mcfadden R^2
+```{r}
+m1_mcfadden <- 1 - (168.72/203.32)
+m2_mcfadden <- 1 - (168.23/203.32)
+m3_mcfadden <- 1 - (164.54/203.32)
+m4_mcfadden <- 1 - (155.59/203.32)
+
+m1_mcfadden
+m2_mcfadden
+m3_mcfadden
+m4_mcfadden
+```
+
+
+## Compare conclusions from the OLS vs. logistic regression analyses
+We get similar conclusions between the 2 analysis aproaches.
+
+
+# Try it yourself
+
+## Data prep
+```{r, message=FALSE}
+
+#obs <- read_csv("bac_obs.csv")
+# Create dichotomized versions of bac (>.08 vs. <= .08) and typ_drks (> average of 2 per day vs. <= average of 2 per day)
+#obs <- mutate(obs, bac_over = ifelse(bac > .08, 1, 0))
+#table(obs$bac_over)
+#describe(obs$weight)
+#obs <- mutate(obs, weight_low = ifelse(weight <= 58.54, 1, 0))
+#write_csv(obs, "bac_module10.csv")
+```
+
+## Import data
+```{r,message=FALSE}
+bac <- read_csv("bac_module10.csv")
+```
+
+## Use OLS regression to predict bac_over with alcexp, pmood, weight_low, and typ_drks
+### Build up models step by step
+```{r,message=FALSE}
+ols_m1 <-lm(bac_over ~ alcexp, data = bac)
+ols_regress(ols_m1)
+
+ols_m2 <-lm(bac_over ~ alcexp + pmood, data = bac)
+ols_regress(ols_m2)
+
+ols_m3 <-lm(bac_over ~ alcexp + pmood + weight_low, data = bac)
+ols_regress(ols_m3)
+
+ols_m4 <-lm(bac_over ~ alcexp + pmood + weight_low + typ_drks, data = bac)
+ols_regress(ols_m4)
+```
+### Compare the OLS models by comparing R^2 values
+Model 1 vs  Model 2: 
+R^2 increases from 0.209 to 0.228, indicating that adding pmood when controlling for alc_exp does not add much explained variance (~2%) to the model.
+
+Model 2 vs. Model 3: 
+R^2 increases from 0.228 to 0.244, indicating that adding weight_low when controlling for alcexp and pmood does not add much explained variance (~2%) to the model
+
+Mode 3 vs. Model 4: 
+R^2 increases frorm 0.244 to 0.371, indicating that about 13% additional varince in bac_over is explained when you add typ_drks to the model while controlling for alc_exp, pmood, and weight_low.
+
+### Compare the OLS models via significance testing with hierarchical regression
+```{r}
+anova(ols_m1,
+      ols_m2,
+      ols_m3,
+      ols_m4)
+```
+The significance tesing indicates that each subsequwnt model explains a significantly larger percent of the variance in Y than the previous model. Keep in mind that, even though the increase in R^2 is significant, 2% is not a huge increase. 
+
+## Use Logistic Regression to predict bac_over with alcexp, pmood, weight_low, and typ_drks
+```{r}
+logreg_mod <- glm(bac_over ~ alcexp + pmood + weight_low + typ_drks, family = binomial, data = bac)
+summary(logreg_mod)
+```
+
+The model above displays the log odds of each predictor variable (While controlling for all other predictors in the model) on the outcome of bac_over. We can see that all of the predictors statistically significant. However, to have a better interpretation of each with odds ratios, we need to exponentiate the coefficients.
+
+### Exponentiate coefficients to get odds ratios and confidence intervals
+```{r,message=FALSE}
+exp(coefficients(logreg_mod))
+exp(confint(logreg_mod))
+```
+
+Intercept: When all of the X variables are zero, the odds of having a bac greater than 0.08 are 0.41 times as likely. Or we can take the inverse and state the they are 2.43 times as likely NOT to develop the outcome of bac over 0.08 (calculated by dividing 1/0.41). The confidence interval does not include 1, indicating that this is statistically significant.
+
+alcexp (continuous): for every one-unit increase in alcexp, the odds of having a bac > 0.08 increased by 1.12. In other words, for every one-unit increase in alcexp, participants are 1.12 times more likely to have a bac > 0.08.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+pmood (continuous): when controlling for alcexp, for every one-unit increase in pmood, the odds of hacing a bac > 0.08 increased by 1.05. In other words, for every one-unit increase in pmood, participants are 1.05 times more likely to have bac > 0.08.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+weight_low (binary): when controlling for alcexp and pmood, participants with lower body weight (coded as 1) wre 1.23 times as likely to have a bac > 0.08 than participants who did not have lower body weight.  The confidence interval does not include 1, indicating that this is statistically significant.
+
+typ_drks (continuous): when controlling for alcexp, pmood, and weight_low, for a one-unit increase in typ_drks the odds of having a bac > 0.08 increase by 1.015. In other wors, for every one-unit increase in typ_drks, participants are 1.015 times as likely to have a bac > 0.08. The confidence interval does not include 1, indicating that this is statistically significant.
+
+### Deviance testing
+```{r}
+anova(logreg_mod,test="Chisq")
+```
+The difference between the deviance for each model and the null is one measure of model fit. These comparisons tell us whether adding information to a null model will lead to better prediction. Each row in the deviance table compares that model to the null model.
+alcexp = model with just alcecp
+pmood = model wth alcexp + pmood
+weight_low = model with alcexp + pmood + weight_low
+typ_drks = model with alcexp + pmood + weight_low + typ_drks
+
+In this case, adding each variable adds to the predictive power of the model (i.e., reducing model deviance). 
+
+### Calculate McFadden's R^2 from deviance table
+This serves as an effect size!
+McFadden R2 =  1-(Deviance model/Deviance Null)
+```{r}
+# get the null deviance from the original model output
+# get the deviance for each model from the residual deviance column of the devaince table
+
+m1_mcfaddens <- 1-(39.374/49.755)
+m1_mcfaddens
+
+m2_mcfaddens  <- 1-(38.436/49.755)
+m2_mcfaddens
+
+m3_mcfaddens <- 1-(37.626/49.755)
+m3_mcfaddens
+
+m4_mcfadens <- 1-(31.295/49.755)
+m4_mcfadens
+```
+
+Now we can compare the McFadden's R^2 to answer the same questions we asked about with hierarchical regression the the OLS models.
+
+Model 1 vs  Model 2: 
+McFaddens R^2 increases from 0.209 to 0.227, indicating that adding pmood when controlling for alc_exp does not add much explained variance (~2%) to the model.
+
+Model 2 vs. Model 3: 
+R^2 increases from 0.227 to 0.244, indicating that adding weight_low when controlling for alcexp and pmood does not add much explained variance (~2%) to the model
+
+Mode 3 vs. Model 4: 
+R^2 increases frorm 0.244 to 0.371, indicating that about 13% additional varince in bac_over is explained when you add typ_drks to the model while controlling for alc_exp, pmood, and weight_low.
+
+Note, these values are essentially identical to what we got from the R^2 vaues in the OLS models above!
+
+## Compare conclusions from the OLS vs. logistic regression analyses
+We get similar conclusions between the 2 analysis aproaches.
+
+

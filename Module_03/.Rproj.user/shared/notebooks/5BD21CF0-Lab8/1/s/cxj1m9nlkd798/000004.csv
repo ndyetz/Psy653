@@ -1,0 +1,1 @@
+"0","fitmed <- psych::mediate(lifesat ~ hygiene + (sleep), data = slp)"

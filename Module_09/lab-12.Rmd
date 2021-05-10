@@ -1,0 +1,465 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Clear environment
+```{r}
+rm(list=ls())
+```
+
+# Load Libraries
+```{r}
+#install.packages("MuMIn")
+
+library(tidyverse)
+library(lme4)
+library(psych)
+library(MuMIn)
+
+```
+
+# Read in Kim's data: Demo activity
+```{r}
+teams <- read_csv("mlm_teams.csv")
+```
+
+## Describe
+```{r}
+describe(teams)
+```
+
+## Factor txcond
+```{r}
+teams <- teams %>%
+mutate(txcond.f = factor(txcond, levels = c(0,1), labels = c("control", "treatment")),
+       team_id.f = factor(team_id))
+```
+
+
+## Factor team_id
+```{r}
+teams <- mutate(teams, team_id.f = factor(team_id))
+```
+
+# Get Mean of Means
+```{r}
+
+team_means  <- group_by(teams, team_id)
+team_means  <- summarize(team_means, mean_score = mean(score))
+meanofmeans <- summarize(team_means, meanofmeans = mean(mean_score))
+meanofmeans
+
+```
+
+```{r}
+
+ggplot(data = teams, aes(x = team_id.f, y = score)) +
+  geom_boxplot() +
+  stat_summary(aes(y = score, group = team_id.f), fun = mean, color = "red", geom = "point", pch = 17, size = 1.5) +
+  geom_hline(yintercept = meanofmeans$meanofmeans, linetype="dashed", color = "black", size = 1) +
+  scale_y_continuous(limits = c(20,100), breaks = seq(20, 100, 10)) +
+  labs(title = "Mean and variability of final scores across teams",
+       subtitle = "dashed line = mean of team means, red triangle = team mean",
+       x = "Team ID", y = "Final Score") +
+  theme(axis.text.x = element_text(colour="grey20", size=8, angle=90, hjust=.5))
+```
+
+
+
+
+## Models
+
+```{r}
+# Random intercept
+randint <- lmer(score ~ 1 + (1|team_id.f), data = teams, REML = FALSE)
+summary(randint)
+
+```
+
+```{r}
+(80.62 / (80.62 + 71.48))
+
+library(sjstats)
+performance::icc(randint)
+
+```
+
+```{r}
+r.squaredGLMM(randint)
+```
+
+```{r}
+# Random intercept Fixed slope
+rifs<-lmer(score ~ 1 + risk + (1|team_id.f),data=teams, REML = FALSE)
+summary(rifs)
+```
+
+```{r}
+performance::icc(rifs)
+
+83.33 / (83.33 + 57.96)
+
+
+```
+
+```{r}
+r.squaredGLMM(rifs)
+```
+
+
+```{r}
+# random slopes fixed intercepts
+rsfi<- lmer(score ~ 1 + risk + (0 + risk|team_id.f),data=teams, REML = FALSE)
+summary(rsfi)
+```
+
+```{r}
+performance::icc(rsfi)
+
+11.32 / (11.32 + 73.37)
+
+
+```
+
+```{r}
+r.squaredGLMM(rsfi)
+```
+
+
+```{r}
+# all random
+allrand<- lmer(score ~ risk +  (1 + risk|team_id.f),data=teams, REML = FALSE)
+summary(allrand)
+```
+```{r}
+performance::icc(allrand)
+
+(79.603 + 7.213) / (79.603 + 7.213 + 40.206) 
+```
+
+
+
+```{r}
+library(modelr)
+
+# Model without with only random intercept
+mod2_b.plot <- add_predictions(data = teams, model = randint)
+
+ggplot(data = mod2_b.plot, aes(x = risk, y = pred, group = team_id.f)) +
+  geom_line() +
+  geom_abline(intercept = 77.868, slope = -2.326, color="red", size=3) +
+  labs(title = "Do students with a higher risk index perform worse on the final test?", x = "Risk Quintile", y =
+         "Predicted Final Score")
+
+# Model without random slope
+mod2_b.plot <- add_predictions(data = teams, model = rifs)
+
+ggplot(data = mod2_b.plot, aes(x = risk, y = pred, group = team_id.f)) +
+  geom_line() +
+  geom_abline(intercept = 77.868, slope = -2.326, color="red", size=3) +
+  labs(title = "Do students with a higher risk index perform worse on the final test?", x = "Risk Quintile", y =
+         "Predicted Final Score")
+
+
+# Model without random intercept
+mod2_b.plot <- add_predictions(data = teams, model = rsfi)
+
+ggplot(data = mod2_b.plot, aes(x = risk, y = pred, group = team_id.f)) +
+  geom_line() +
+  geom_abline(intercept = 77.868, slope = -2.326, color="red", size=3) +
+  labs(title = "Do students with a higher risk index perform worse on the final test?", x = "Risk Quintile", y =
+         "Predicted Final Score")
+
+# Model with random slope & Intercept
+mod2_a.plot <- add_predictions(data = teams, model = allrand)
+
+ggplot(data = mod2_a.plot, aes(x = risk, y = pred, group = team_id.f)) +
+  geom_line() +
+  geom_abline(intercept = 77.868, slope = -2.326, color="red", size=3) +
+  labs(title = "Do students with a higher risk index perform worse on the final test?", x = "Risk Quintile", y = "Predicted Final Score")
+```
+
+
+
+
+```{r}
+r.squaredGLMM(allrand)
+```
+
+
+## Pairwise comparison
+```{r}
+
+anova(randint,allrand)
+
+```
+```{r}
+anova(rifs,allrand)
+```
+
+```{r}
+anova(rsfi,allrand)
+```
+
+
+
+
+
+# New Dataset: Try it Yourself
+## Read in data
+```{r}
+#library(haven)
+#
+#test <- read_sav("popular2.sav")
+#
+#
+#popular <- test %>% 
+#  select(pupil, class, Cextrav, popular) %>% 
+#  as_tibble()
+#
+#write_csv(popular, "popular.csv", na = "")
+
+popular <- read_csv("popular.csv")
+
+
+```
+
+
+## Describe data
+```{r}
+describe(popular)
+```
+
+# Factor class
+```{r}
+popular <- mutate(popular, class.f = factor(class))
+```
+
+# Get Mean of Means
+```{r}
+team_means  <- group_by(popular, class)
+team_means  <- summarize(team_means, mean_pop = mean(popular))
+meanofmeans <- summarize(team_means, meanofmeans = mean(mean_pop))
+meanofmeans
+```
+
+```{r}
+ggplot(data = popular, aes(x = class.f, y = popular)) +geom_boxplot() +stat_summary(aes(y = popular, group = class.f), fun = mean, color = "red", geom = "point", pch = 17, size = 1.5) +geom_hline(yintercept = meanofmeans$meanofmeans, linetype="dashed", color = "black", size = 1) +scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 0.5)) +labs(title = "Mean and variability of popularity across class",subtitle = "dashed line = mean of class means, red triangle = class mean",x = "Class", y = "Popularity") +theme(axis.text.x = element_text(colour="grey20", size=8, angle=90, hjust=.5))
+```
+
+
+## Random Intercept only model
+```{r}
+# Random intercept
+randint <- lmer(popular ~ 1 + (1|class.f), data = popular, REML = FALSE)
+summary(randint)
+```
+
+### ICC 
+```{r}
+# ICC
+0.6945/(0.6945+1.2218)
+```
+
+### Pseudo R^2
+```{r}
+# R^2
+r.squaredGLMM(randint)
+```
+
+
+
+## Random intercept Fixed Slope model
+```{r}
+# Random intercept Fixed slope
+rifs<-lmer(popular ~ 1 + Cextrav + (1|class.f),data=popular, REML = FALSE)
+summary(rifs)
+```
+
+
+### Plot
+```{r}
+mod2.plot <- add_predictions(data=popular, model=rifs)
+
+ggplot(data=mod2.plot, aes(x=Cextrav, y=pred, group=class.f))+
+  geom_line()+
+  geom_abline(intercept=5.07824, slope=0.48620, color="red", size=3)+
+  labs(title="Are extraverted students more popular?", x="Extraversion (Mean centered)", y ="Predicted Popularity")
+
+
+```
+
+
+
+### ICC
+```{r}
+# ICC
+0.8314/(0.8314 + 0.9299)
+```
+
+
+### Pseudo R^2
+```{r}
+# R^2
+r.squaredGLMM(rifs)
+```
+
+
+
+## Random Slope, Fixed Intercept model
+```{r}
+
+# random slopes fixed intercepts
+rsfi<- lmer(popular ~ 1 + Cextrav + (1 + Cextrav|class.f),data=popular, REML = FALSE)
+summary(rsfi)
+
+```
+
+
+### Plot model
+```{r}
+# Model without random intercept
+mod3.plot <- add_predictions(data=popular, model=rsfi)
+
+ggplot(data=mod3.plot, aes(x=Cextrav, y=pred, group=class.f))+
+  geom_line()+
+  geom_abline(intercept=5.06055, slope=0.34167, color="red", size=3)+
+  labs(title="Are extraverted students more popular?", x="Extraversion (Mean Centered)", y ="Predicted Popularity")
+
+
+```
+
+### ICC
+```{r}
+#ICC
+0.08356/(0.08356 + 1.59167)
+```
+
+### Pseudo R^2
+```{r}
+#R^2
+r.squaredGLMM(rsfi)
+```
+
+
+## All Random Model
+```{r}
+
+# all random
+allrand<- lmer(popular ~ Cextrav +  (1 + Cextrav|class.f),data=popular, REML = FALSE)
+summary(allrand)
+
+```
+
+## Plot
+```{r}
+mod4.plot <- add_predictions(data=popular, model=allrand)
+
+ggplot(data=mod4.plot, aes(x=Cextrav, y=pred, group=class.f))+
+  geom_line()+
+  geom_abline(intercept=5.03184, slope=0.49290, color="red", size=3)+
+  labs(title="Are extraverted students more popular?", x="Extraversion (Mean Centered)", y ="Predicted Popularity")
+```
+
+### ICC
+```{r}
+#ICC
+0.88225+0.02522/(0.88225+0.02522+0.89505)
+```
+
+### Psuedo R^2
+```{r}
+#R^2
+r.squaredGLMM(allrand)
+```
+
+
+## Pairwise comparison
+### randint vs all random
+```{r}
+anova(randint,allrand)
+```
+### RIFS vs all random
+```{r}
+anova(rifs,allrand)
+```
+### RSFI vs all random
+```{r}
+anova(rsfi,allrand)
+```
+
+
+
+
+
+# OLD DATA
+
+```{r}
+org <- read_csv("orgdata.csv")
+```
+
+
+## Describe
+```{r, rows.print = 13}
+describe(org)
+```
+
+
+## Create measure of gender balance in workforce
+```{r}
+org <- mutate(org, percmale = nmale/nemploy)
+```
+
+
+##  Models
+```{r}
+# Random intercept
+randint <- lmer(Develop ~ 1 + (1|HCollect), data = org, REML = FALSE)
+summary(randint)
+
+# Random intercept Fixed slope
+rifs<-lmer(Develop~ 1 + percmale + (1|HCollect),data=org, REML = FALSE)
+summary(rifs)
+
+# random slopes fixed intercepts
+rsfi<- lmer(Develop ~ 1 + percmale + (0 + percmale|HCollect),data=org, REML = FALSE)
+summary(rsfi)
+
+# all random
+allrand<- lmer(Develop ~ percmale +   (1 + percmale|HCollect),data=org, REML = FALSE)
+summary(allrand)
+```
+
+
+
+## ICC
+variance / (variance + residual)
+```{r}
+library(sjstats)
+
+performance::icc(randint)
+performance::icc(rifs)
+performance::icc(rsfi)
+performance::icc(allrand)
+
+```
+
+
+## R^2 
+```{r, warning = FALSE}
+
+r.squaredGLMM(randint)
+r.squaredGLMM(rifs)
+r.squaredGLMM(rsfi)
+r.squaredGLMM(allrand)
+
+```
+
+
+## Pairwise comparison
+```{r}
+anova(rifs,allrand)
+anova(randint,allrand)
+anova(rsfi,allrand)
+```

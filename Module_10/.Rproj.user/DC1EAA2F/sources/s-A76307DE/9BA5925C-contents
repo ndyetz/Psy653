@@ -1,0 +1,8 @@
+library(tidyverse)
+studies<-read_csv(file="studies2.csv")
+#install.packages("meta")
+library(meta)
+metacor(r, n, Study, data=studies)
+fit<-metacor(r, n, Study, data=studies)
+forest(fit)
+funnel(fit)

@@ -1,0 +1,108 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load libraries 
+```{r}
+library(tidyverse)
+library(ez)
+library(psych)
+```
+
+# Read in data
+```{r}
+syl <- read_csv("syllables.csv")
+```
+
+
+```{r}
+describe(syl)
+```
+
+# Factor variables
+```{r}
+syl <- mutate(syl, 
+               ID.f     = as.factor(ID),
+               cond.f   = factor(cond,
+                               levels = c(0,1),
+                               labels = c("Quiet", "Noisy")),
+               length.f = factor(length,
+                               levels = c(2,3,4),
+                               labels = c("2 syl", "3 syl", "4 syl"))
+               )
+```
+
+
+
+
+
+# Repeated measures ANOVA
+```{r}
+ezANOVA(
+        data = syl,
+        dv = time,
+        wid = ID.f, 
+        within = length.f,
+        detailed = TRUE,
+        type = 3
+        )
+```
+
+# Visualize the effect
+## By condition
+```{r}
+ggplot(syl, aes(y = time, color = cond.f)) +
+  geom_boxplot()
+
+```
+
+
+## by length
+```{r}
+
+ggplot(syl, aes(y = time, color = length.f)) +
+  geom_boxplot()
+
+```
+
+## by length & Condition
+```{r}
+
+ggplot(syl, aes(y = time, color = length.f)) +
+  geom_boxplot() +
+  facet_wrap(~cond.f)
+
+```
+
+
+```{r}
+ezANOVA(
+        data=syl,
+        dv=time,
+        wid=ID.f, 
+        within= length.f,
+        between = cond.f,
+        detailed=TRUE,
+        type = 3
+        )
+```
+
+
+# Visualize the effect
+```{r}
+
+
+syl_sum <- group_by(syl, cond.f, length.f) 
+syl_sum <- summarise(syl_sum, time = mean(time)) 
+syl_sum <- ungroup(syl_sum)
+
+
+
+ggplot(syl_sum, aes(x = length.f, y = time, color = cond.f)) + 
+  geom_line(aes(group = cond.f)) 
+
+
+
+```
+

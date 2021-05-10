@@ -1,0 +1,10 @@
+"0","lr <- read_csv(""Logistic2.csv"")"
+"2","Parsed with column specification:
+cols(
+  Y = [32mcol_double()[39m,
+  X1 = [32mcol_double()[39m,
+  X2 = [32mcol_double()[39m,
+  X3 = [32mcol_double()[39m,
+  X4 = [32mcol_double()[39m
+)
+"

@@ -1,0 +1,58 @@
+---
+title: "PSY 653 Module 3: Nested Designs"
+subtitle: "Gemma Wallace & Neil Yetz"
+output: html_notebook
+---
+
+# Part 1: Demo of Nested ANOVAs
+
+## Load libraries
+```{r, message=FALSE}
+library(psych)
+library(tidyverse)
+```
+
+## Read data
+```{r, message=FALSE}
+nested_demo<-read.csv(file="Nested_demo.csv")
+```
+ 
+## Get variable descriptives
+```{r, row.print=13}
+psych::describe(nested_demo) #note: variables are factors (include text)
+```
+
+# Calculate the mean values of Y by hospital, drug, and condition
+```{r}
+# aggregate function here just shwows the values that we're comparing, but not saving these values
+aggregate(nested_demo$Y, by=list(Hospital=nested_demo$Hospital), mean)
+aggregate(nested_demo$Y, by=list(Drug=nested_demo$Drug), mean)
+aggregate(nested_demo$Y, by=list(Condition=nested_demo$Condition), mean)
+```
+
+## Nested ANOVA in which Y is regressed on Hospital, Drug, Condition, and the interaction between hospital and condition (taking into )
+```{r}
+# Syntax: / specifies within, and * specifies the interaction
+anova(lm(Y ~ Hospital + Drug + Hospital*Drug +  Condition/Drug + Hospital *(Condition/Drug), data=nested_demo))
+
+# drug not nested within hospital in this data, because the drugs are the same between the two hospitals
+```
+
+# Part 2: Try it Yourself
+## Read data
+```{r, message=FALSE}
+nested_practice<-read.csv(file="Nested_practice.csv")
+```
+ 
+## Get variable descriptives
+```{r, row.print=13}
+psych::describe(nested_practice) #note: variables are factors (include text)
+```
+
+## Nested ANOVA in which Y is regressed on hospital, drug, and condition, while taking into account nesting structure
+```{r}
+anova(lm(Y ~ Hospital + Hospital/Drug + Hospital/Condition +  Hospital/Drug/Condition, data=nested_practice))
+
+# drug is nested within hospital, condition is nested within drug, and both are nested within hospital
+```
+

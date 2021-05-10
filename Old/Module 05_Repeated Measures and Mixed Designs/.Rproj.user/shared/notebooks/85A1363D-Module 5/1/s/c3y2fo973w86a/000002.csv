@@ -1,0 +1,6 @@
+"0","syl_sum <- group_by(syl, cond, length) "
+"0","syl_sum <- summarise(syl_sum, time = mean(time)) "
+"0","syl_sum <- ungroup(syl_sum)"
+"0","ggplot(syl_sum, aes(x = length, y = time, group = length, fill = length)) + "
+"0","  facet_wrap(~cond) +"
+"0","  theme_bw() "

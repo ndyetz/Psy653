@@ -1,0 +1,11 @@
+"0","lab_data <- read_csv(""lab_data.csv"")"
+"2","Duplicated column names deduplicated: 'X4' => 'X4_1' [5]"
+"2","Parsed with column specification:
+cols(
+  X1 = [32mcol_double()[39m,
+  X2 = [32mcol_double()[39m,
+  X3 = [32mcol_double()[39m,
+  X4 = [32mcol_double()[39m,
+  X4_1 = [32mcol_double()[39m
+)
+"

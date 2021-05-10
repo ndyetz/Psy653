@@ -1,0 +1,108 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tseries)
+library(forecast)
+library(psych)
+library(tidyverse)
+```
+
+
+```{r}
+#covid <- read_csv("covid.csv", 
+#                  col_types = cols(date = col_date("%m/%d/%Y")))
+#
+#
+#covid <- filter(covid, location == "United States")
+#covid <- filter(covid, !is.na(new_cases))
+#covid <- select(covid, location, date, new_cases)
+#
+#write_csv(covid, "covid2.csv", na = "")
+
+
+covid <- read_csv("covid2.csv")
+
+```
+
+
+# describe data 
+```{r}
+describe(covid)
+```
+
+# Plot the data
+```{r}
+ggplot(covid, aes(x = date, y = new_cases)) +
+  geom_line()
+```
+
+```{r}
+count_cases <- ts(covid$new_cases, frequency = 30)
+adf.test(count_cases) # Data not stationary
+```
+
+
+```{r}
+decomp <- stl(count_cases, s.window = "periodic")
+```
+
+
+```{r}
+deseasonal_cnt <- seasadj(decomp)
+count_d1 <- diff(deseasonal_cnt, difference = 1)
+plot(count_d1)
+```
+
+```{r}
+adf.test(count_d1)
+```
+```{r}
+Acf(count_d1)
+```
+
+
+```{r}
+Pacf(count_d1)
+```
+```{r}
+arima1 <- arima(deseasonal_cnt, c(1,1,1))
+summary(arima1)
+confint(arima1)
+```
+
+
+```{r}
+arima2 <- arima(deseasonal_cnt, c(0,1,1))
+summary(arima2)
+confint(arima2)
+```
+
+
+
+```{r}
+arima3 <- arima(deseasonal_cnt, c(0,1,2))
+summary(arima3)
+confint(arima3)
+```
+
+
+
+```{r}
+auto.arima(deseasonal_cnt, seasonal = FALSE)
+```
+
+
+```{r}
+autoplot(forecast(deseasonal_cnt))
+```
+
+
+
+
+
+
+
+

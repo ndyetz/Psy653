@@ -1,0 +1,125 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# Load libraries
+```{r}
+#install.packages("forecast")
+#install.packages("tseries")
+
+
+library(forecast)
+library(tseries)
+library(psych)
+library(tidyverse)
+```
+
+```{r}
+daily_data <- read_csv("day.csv", 
+                       col_types = cols(Date = col_date("%m/%d/%Y")))
+```
+
+
+
+```{r}
+daily_data <- select(daily_data, Date, season, cnt)
+```
+
+```{r}
+describe(daily_data)
+```
+
+
+
+```{r}
+ggplot(daily_data, aes(x = Date, y = cnt)) + 
+  geom_line() + 
+  ylab("Daily Bike Checkouts") 
+```
+
+
+
+
+
+
+#Step 1: COnvert to a time series object
+```{r}
+# Convert to a timeseries
+count_ts <-  ts(daily_data$cnt)
+```
+
+
+
+# Step 2, check stationairity of the data
+```{r}
+# Data is not stationary we need to do a difference count
+adf.test(count_ts)
+
+```
+
+
+```{r}
+# Set to 30 cases per month
+count_ma <- ts(daily_data$cnt, frequency = 30) 
+decomp <- stl(count_ma, s.window="periodic")
+
+```
+
+
+```{r}
+deseasonal_cnt <- seasadj(decomp)
+count_d1 <-  diff(deseasonal_cnt, differences = 1)
+plot(count_d1)
+```
+
+```{r}
+adf.test(count_d1)
+```
+
+
+```{r}
+Acf(count_d1)
+```
+
+```{r}
+Pacf(count_d1) 
+```
+
+
+
+
+```{r}
+arima1 <- arima(deseasonal_cnt, c(1,1,1))
+summary(arima1)
+confint(arima1)
+# All confidence intervals are outside the bounds of 0, therefore, this is a good model. 
+```
+
+```{r}
+arima2 <- arima(deseasonal_cnt, c(1,1,2))
+summary(arima2)
+confint(arima2)
+# The confindence intervals for ma2 contains 0, therefore, the previous model was better. No need to continue further.
+```
+
+
+```{r}
+arima3 <- arima(deseasonal_cnt, c(2,1,1))
+summary(arima3)
+confint(arima3)
+# The confindence intervals for ar2 contains 0, therefore, the previous model was better. No need to continue further.
+```
+
+
+
+```{r}
+auto_arima <- auto.arima(deseasonal_cnt, seasonal= FALSE)
+summary(auto_arima)
+```
+
+```{r}
+autoplot(forecast(deseasonal_cnt))
+```
+

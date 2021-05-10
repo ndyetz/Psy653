@@ -1,0 +1,271 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Load Libraries
+```{r}
+library(psych)
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+
+```
+
+
+# class demo dataset
+```{r}
+#Wide dataset will convert to long below
+wide <- read_csv("mlm_grow.csv")
+```
+
+# Format and output class demo
+```{r}
+###### Stolen from Kim Start #######
+long_perf <- wide %>%
+  select(kid_id, txcond, perf_0:perf_6) %>%
+  gather(key = measure, value = perform, perf_0:perf_6) %>%
+  separate(measure, c("temp", "week")) %>%
+  select(-temp) %>%
+  mutate(week = as.numeric(week))
+
+
+long_inter <- wide %>%
+  select(kid_id, inter_0:inter_6) %>%
+  gather(key = measure, value = interest, inter_0:inter_6) %>%
+  separate(measure, c("temp", "week")) %>%
+  select(-temp) %>%
+  mutate(week = as.numeric(week))
+
+grow <- full_join(long_perf, long_inter, by = c("kid_id", "week"))
+
+grow <- grow %>%
+  mutate(txcond.f = factor(txcond, levels = c(0,1), labels = c("control", "treatment")),
+  kid_id.f = factor(kid_id))
+
+###### Stolen From Kim End ######
+
+# Simplify dataset
+grow <- select(grow, kid_id, week, perform)
+# Write to csv
+#write_csv(grow, "grow.csv", na = "")
+
+```
+
+# Start demo
+
+# Read in Data
+```{r}
+grow <- read_csv("grow.csv")
+```
+
+
+# Describe data
+```{r}
+describe(grow)
+```
+
+
+# Aggregate the data
+```{r}
+agg_long <- aggregate(x = grow$perform, by = list(week = grow$week), FUN = mean)
+agg_long
+```
+
+
+
+
+# Visualize the data
+```{r, fig.width=9, fig.height=9}
+
+ggplot(grow, aes(x = week, y = perform)) +
+  geom_jitter(aes(color = factor(week))) +
+  geom_smooth(method = "loess", color = "red", size = 2) +
+  xlab("Week") +
+  ylab("Performance") +
+  labs(color = "Week")
+```
+
+# Baseline model
+```{r}
+mod1 <-  lmer(perform ~ 1 + (1|kid_id), REML = TRUE, data = grow)
+summary(mod1)
+```
+
+
+
+
+
+
+# Separated by subject
+```{r, fig.height = 12, fig.width=12}
+ggplot(data = grow, aes(x = week, y = perform)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_y_continuous(limits = c(0,10)) +
+  scale_x_continuous(limits = c(0,6), breaks = c(0,1,2,3,4,5,6)) +
+  facet_wrap(~kid_id) +
+  labs(title = "Do students in the control condition improve their task performance over the course of the program?",
+    x = "Week in the program", y = "Task Performance")
+```
+
+
+
+
+```{r}
+mod2 <-  lmer(perform ~ 1 + week + (1 + week|kid_id), REML = TRUE, data = grow)
+summary(mod2)
+```
+
+
+
+```{r, fig.width=12, fig.height=8}
+# Get predicted values
+mod2.plot <- add_predictions(data = grow, model = mod2)
+
+# Make plot
+ggplot(data = mod2.plot, aes(x = week, y = pred, group = kid_id)) +
+  geom_line(color = "grey53") +
+  geom_abline(intercept = 4.4731, slope = .1438, color="red", size=3) +
+  scale_y_continuous(limits = c(0,10)) +
+  scale_x_continuous(limits = c(0,6), breaks = c(0,1,2,3,4,5,6)) +
+  labs(title = "Do students improve on task performance over the course of the program?",
+    x = "Week", y = "Predicted Performance") +
+  theme_bw()
+
+
+```
+
+
+
+
+# Assignment
+
+
+# Read in data
+```{r}
+long <- read_csv("Longitudinal.csv")
+```
+
+# Describe data
+```{r}
+describe(long)
+```
+
+
+#Factor variables
+```{r}
+#long <- mutate(long, 
+#               job = factor(job, levels = c(0,1), labels = c("half time", "full time")),
+#               sex = factor(sex, levels = c(0,1), labels = c("male", "female"        ))
+#               )
+```
+
+
+
+
+# Aggregate data
+```{r}
+agg_long <- aggregate(x=long$gpa,by=list(occasion = long$occas), FUN=mean)
+agg_long
+```
+
+
+
+```{r}
+ggplot(agg_long, aes(x = occasion, y = x)) +
+  geom_line() +
+  ylab("GPA")
+  
+```
+
+
+
+
+```{r, fig.width=9, fig.height=7}
+
+ggplot(long, aes(x = occas, y = gpa)) +
+  geom_jitter(aes(color = factor(occas))) +
+  geom_smooth(method = "loess", color = "red", size = 2) +
+  xlab("Occasion") +
+  labs(color = "Occasion")
+```
+
+```{r, fig.width = 9, fig.height=7}
+
+ggplot(long, aes(x = occas, y = gpa,)) +
+  geom_jitter(aes(color = factor(occas))) +
+  geom_smooth(method = "loess", color = "red", size = 2) +
+  xlab("Occasion") +
+  labs(color = "Occasion") +
+  facet_wrap(~sex)
+```
+
+
+
+```{r, fig.width = 12, fig.height=12}
+ggplot(data = long, aes(x = occas, y = gpa)) +
+geom_point() +
+geom_smooth(method = "lm", se = FALSE) +
+facet_wrap(~student) +
+labs(title = "Do students increase in GPA across occasion?",
+x = "Occasion", y = "GPA")
+```
+
+
+# Baseline model
+```{r}
+
+mod1 = lmer(gpa ~ 1 + (1|student), REML = TRUE, data = long)
+summary(mod1)
+```
+
+
+
+# Added time as a random factor
+```{r}
+
+mod2 = lmer(gpa ~ 1 + occas + (1 + occas|student), REML = TRUE, data = long)
+summary(mod2)
+```
+
+# ICC
+ICC = variance for effect of interest / variance for effect + unexplained variance
+This is the underlying structure of the F statistic
+ICC for mod 2 = .005 / .005 + .042 = .106
+
+Compare the ICCs across the different models 
+
+
+```{r}
+
+```
+
+
+
+
+
+# Add covariate
+```{r}
+
+mod4 = lmer(gpa ~ 1 + sex + (1|student), REML = TRUE, data = long)
+summary(mod4)
+```
+
+
+```{r}
+mod5 = lmer(gpa ~ 1 + occas + sex + (1 + occas|student), REML = TRUE, data = long)
+summary(mod5)
+```
+
+# Job + sex
+```{r}
+mod6 = lmer(gpa ~ 1 + sex + job + (1|student), REML = TRUE, data = long)
+summary(mod6)
+```
+
+
+```{r}
+mod7 = lmer(gpa ~ 1 + occas + sex + job + (1+ occas|student), REML = TRUE, data = long)
+summary(mod7)
+```

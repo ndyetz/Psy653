@@ -1,0 +1,19 @@
+"0","library(tidyverse)"
+"0","library(psych)"
+"0","library(olsrr)"
+"2","package ‘olsrr’ was built under R version 3.6.3"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"2","Check out our interactive app for quick data exploration. Visit: https://apps.rsquaredacademy.com/.
+"
+"2","
+Attaching package: ‘olsrr’
+
+"
+"2","The following object is masked from ‘package:datasets’:
+
+    rivers
+
+"

@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# Load libraries
+```{r}
+library(tidyverse)
+```
+
+
+# Read in data
+```{r}
+nc <- read_csv("Nestedcorrs.csv")
+
+#nc <- filter(nc, !is.na(sex))
+#write_csv(nc, "Nestedcorrs.csv", na = "")
+```
+
+
+# Get overall correlation
+```{r}
+
+cor(nc[,-1])
+
+
+```
+# Subset to just male and female datasets
+```{r}
+
+
+females <- filter(nc, sex == "F")
+males   <- filter(nc, sex == "M")
+
+```
+
+
+# Get female correlations
+```{r}
+cor_females <- cor(females[, -1])[2,1]
+```
+
+# Get male correlations
+```{r}
+cor_males <- cor(males[, -1])[2,1]
+```
+
+# Compute lambdas 
+## For males
+### X
+```{r}
+lambda_mx <- sd(males$X) / sd(nc$X)
+lambda_mx 
+```
+### Y
+```{r}
+lambda_my <- sd(males$Y) / sd(nc$Y)
+lambda_my
+```
+## For females
+### X
+```{r}
+lambda_fx <- sd(females$X) / sd(nc$X)
+
+```
+### Y 
+```{r}
+lambda_fy <-  sd(females$Y) / sd(nc$Y)
+```
+
+
+# Between group portion of the correlation
+## In Y
+```{r}
+dby <- ((mean(males$Y) - mean(females$Y)) * sqrt((nrow(males) / nrow(nc))*(nrow(females) / nrow(nc)))) / sd(nc$Y)
+dby
+```
+## In X
+```{r}
+dbx <- ((mean(males$X) - mean(females$X)) * sqrt((nrow(males) / nrow(nc))*(nrow(females) / nrow(nc)))) / sd(nc$X)
+dbx
+```
+
+
+# Nested correlation coefficient
+```{r}
+nested_correlation <- dbx*dby + (cor_males * (nrow(males) / nrow(nc)) * lambda_mx*lambda_my) + (cor_females * (nrow(females) / nrow(nc)) * lambda_fx*lambda_fy)
+nested_correlation
+```
+
+
+

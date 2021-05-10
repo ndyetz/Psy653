@@ -1,0 +1,21 @@
+library(tidyverse)
+library(mice)
+
+
+lab_data <- read_csv("lab_data.csv")
+#cor(dat, use = "pairwise.complete.obs")
+
+#Run linear model with pairwise deletion
+mod1 <- lm(X1 ~ X2, data = lab_data)
+summary(mod1)
+
+table(lab_data$X1, useNA = "always")
+
+imputed_data <- mice(lab_data, m=5, maxit = 50, method = 'pmm', seed = 500)
+
+fit.mi <- with(imputed_data, exp= lm(X1 ~ X2))
+summary(fit.mi)
+
+combimp <- pool(fit.mi)
+summary(combimp)
+

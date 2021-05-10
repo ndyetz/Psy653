@@ -1,0 +1,5 @@
+"0","ex <- mutate(ex, "
+"0","             Subject = factor(Subject),"
+"0","             Passage = factor(Passage),"
+"0","             Genre   = factor(Genre)"
+"0","             )"

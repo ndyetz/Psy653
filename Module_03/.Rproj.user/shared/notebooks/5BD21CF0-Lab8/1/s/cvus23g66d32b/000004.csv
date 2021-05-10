@@ -1,0 +1,7 @@
+"0","summary(fitmed)"
+"1","Call: "
+"1","psych::mediate(y = Y1 ~ X5 + (X4), data = med)
+"
+"1","
+Direct effect estimates (traditional regression)    (c') 
+"

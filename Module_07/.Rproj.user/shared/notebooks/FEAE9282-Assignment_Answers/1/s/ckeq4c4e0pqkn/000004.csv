@@ -1,0 +1,3 @@
+"0","deseasonal_cnt <- seasadj(decomp)"
+"0","count_d1 <- diff(deseasonal_cnt, difference = 1)"
+"0","plot(count_d1)"

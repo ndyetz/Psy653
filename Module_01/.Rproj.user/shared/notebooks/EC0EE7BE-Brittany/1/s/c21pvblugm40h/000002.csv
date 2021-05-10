@@ -1,0 +1,11 @@
+"0","orgs <- read_csv(""Nested_Brittany.csv"")"
+"2","
+[36m--[39m [1m[1mColumn specification[1m[22m [36m-----------------------------------------------------------------------------------------------------------------------------------[39m
+cols(
+  Productivity = [32mcol_double()[39m,
+  Org = [31mcol_character()[39m,
+  Dept = [31mcol_character()[39m,
+  Condition = [31mcol_character()[39m
+)
+
+"
